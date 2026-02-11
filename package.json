@@ -1,0 +1,23 @@
+{
+  "name": "computing-project-2",
+  "version": "1.0.0",
+  "description": "Group project.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xDannyBoyyx/Computing_Project_2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xDannyBoyyx/Computing_Project_2/issues"
+  },
+  "homepage": "https://github.com/xDannyBoyyx/Computing_Project_2#readme",
+  "dependencies": {
+    "phaser": "^3.90.0"
+  }
+}
