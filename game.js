@@ -2,7 +2,7 @@
 
 // Configuration for the game and how it works
 
-// import { Player } from './player.js'; // this imports the player into the map
+import { Player } from './player.js'; // imports the user
 
 const config = {
   type: Phaser.AUTO,
