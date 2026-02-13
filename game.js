@@ -84,5 +84,10 @@ function create() {
   // puts the character at position (320, 180) - center of the screen
   this.player = new Player(this, 320, 180);
 
-this.cameras.main.startFollow(this.player.sprite);
+  this.cameras.main.startFollow(this.player.sprite);
+
+  this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16);
+  this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
+  
+  this.player.sprite.setCollideWorldBounds(true);
 }
