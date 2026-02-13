@@ -1,6 +1,9 @@
 // Where the game will work together
 
 // Configuration for the game and how it works
+
+import { Player } from './player.js'; // this imports the player into the map
+
 const config = {
   type: Phaser.AUTO,
   width: 640,
@@ -52,3 +55,11 @@ function create() {
 function update() {
 
 }
+
+preload() {
+    this.load.spritesheet('player', 'assets/sprites/player.png', {
+        frameWidth: 64,  // the sprite looks like 64x64
+        frameHeight: 64
+    });
+}
+
