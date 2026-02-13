@@ -1,2 +1,3 @@
 # Computing_Project_2
-Group project.
+
+Game link: https://xdannyboyyx.github.io/Computing_Project_2/
