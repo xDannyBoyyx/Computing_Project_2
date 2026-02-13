@@ -42,11 +42,6 @@ function preload() {
   this.load.image('grassTiles', 'assets/GRASS+.png');
 }   
 
-// // ADD THIS: Load player spritesheet
-//   this.load.spritesheet('player', 'assets/sprites/player.png', {
-//     frameWidth: 64,
-//     frameHeight: 64
-//   });
 
 // Creating features including the map and assets
 function create() {
