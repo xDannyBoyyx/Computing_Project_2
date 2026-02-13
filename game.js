@@ -83,10 +83,6 @@ function create() {
   
   // puts the character at position (320, 180) - center of the screen
   this.player = new Player(this, 320, 180);
-} 
 
-function update() {
-  if (this.player) {
-    this.player.update();
-  }
+this.cameras.main.startFollow(this.player.sprite);
 }
