@@ -86,8 +86,19 @@ function create() {
 
   this.cameras.main.startFollow(this.player.sprite);
 
-  this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16);
+  this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16); //40 tiles wide, 25 tiles tall, 16 pixels.
   this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
   
   this.player.sprite.setCollideWorldBounds(true);
 }
+
+function update() {
+  if(this.player) {
+    this.player.update();
+  }
+}
+
+
+
+
+
