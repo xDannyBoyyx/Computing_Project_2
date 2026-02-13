@@ -41,12 +41,11 @@ function preload() {
   this.load.tilemapTiledJSON('mapJson', 'map.json');
   this.load.image('grassTiles', 'assets/GRASS+.png');
 
-  this.load.spritesheet('player', 'assets/char_a_p1_0bas_humn_v00.png', {
+  this.load.spritesheet('player', 'assets/sprites/char_a_p1_0bas_humn_v00.png', {
     frameWidth: 64,
     frameHeight: 64
   });
 }
-
 
 // Creating features including the map and assets
 function create() {
