@@ -47,7 +47,6 @@ function preload() {
 //     frameWidth: 64,
 //     frameHeight: 64
 //   });
-// }
 
 // Creating features including the map and assets
 function create() {
