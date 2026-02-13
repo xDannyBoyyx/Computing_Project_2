@@ -36,7 +36,7 @@ const config = {
 // Creating it via Phaser
 const game = new Phaser.Game(config);   
 
-// Preloading images
+// Preloading images (background map and teh character
 function preload() {
   this.load.tilemapTiledJSON('mapJson', 'map.json');
   this.load.image('grassTiles', 'assets/GRASS+.png');
@@ -47,13 +47,11 @@ function preload() {
   });
 }
 
-// Creating features including the map and assets
 function create() {
   const map = this.make.tilemap({ key: 'mapJson' });
   const tileset = map.addTilesetImage('grass', 'grassTiles');
   map.createLayer('Background', tileset, 0, 0); 
 
-// Added
   
   this.anims.create({
     key: 'walk-down',
@@ -83,14 +81,10 @@ function create() {
     repeat: -1
   });
   
-  // Create the player at position (320, 180) - center of the screen
+  // puts the character at position (320, 180) - center of the screen
   this.player = new Player(this, 320, 180);
 } 
 
-
-
-// Updating features and their technicality //to be added
-// Updating features and their technicality
 function update() {
   if (this.player) {
     this.player.update();
