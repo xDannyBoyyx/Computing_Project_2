@@ -52,7 +52,42 @@ function create() {
   const map = this.make.tilemap({ key: 'mapJson' });
   const tileset = map.addTilesetImage('grass', 'grassTiles');
   map.createLayer('Background', tileset, 0, 0); 
+
+// Added
+  
+  this.anims.create({
+    key: 'walk-down',
+    frames: this.anims.generateFrameNumbers('player', { start: 32, end: 39 }),
+    frameRate: 10,
+    repeat: -1
+  });
+  
+  this.anims.create({
+    key: 'walk-up',
+    frames: this.anims.generateFrameNumbers('player', { start: 40, end: 47 }),
+    frameRate: 10,
+    repeat: -1
+  });
+  
+  this.anims.create({
+    key: 'walk-left',
+    frames: this.anims.generateFrameNumbers('player', { start: 48, end: 55 }),
+    frameRate: 10,
+    repeat: -1
+  });
+  
+  this.anims.create({
+    key: 'walk-right',
+    frames: this.anims.generateFrameNumbers('player', { start: 56, end: 63 }),
+    frameRate: 10,
+    repeat: -1
+  });
+  
+  // Create the player at position (320, 180) - center of the screen
+  this.player = new Player(this, 320, 180);
 } 
+
+
 
 // Updating features and their technicality //to be added
 function update() {
