@@ -56,6 +56,48 @@ function update() {
 
 }
 
+
+
+
+create() {
+    // Walking down (row 4)
+    this.anims.create({
+        key: 'walk-down',
+        frames: this.anims.generateFrameNumbers('player', { start: 32, end: 39 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    
+    // Walking up (row 5)
+    this.anims.create({
+        key: 'walk-up',
+        frames: this.anims.generateFrameNumbers('player', { start: 40, end: 47 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    
+    // Walking left (row 6)
+    this.anims.create({
+        key: 'walk-left',
+        frames: this.anims.generateFrameNumbers('player', { start: 48, end: 55 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    
+    // Walking right (row 7)
+    this.anims.create({
+        key: 'walk-right',
+        frames: this.anims.generateFrameNumbers('player', { start: 56, end: 63 }),
+        frameRate: 10,
+        repeat: -1
+    });
+    
+    this.player = new Player(this, 400, 300);
+}
+
+
+
+
 preload() {
     this.load.spritesheet('player', 'assets/sprites/player.png', {
         frameWidth: 64,  // the sprite looks like 64x64
