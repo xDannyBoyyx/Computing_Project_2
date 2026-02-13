@@ -21,10 +21,10 @@ export class Player {
         
         if (this.cursors.left.isDown || this.wasd.left.isDown) {
             this.sprite.body.setVelocityX(this.speed);
-            this.sprite.anims.play('walk-right', true);
+            this.sprite.anims.play('walk-left', true);
         } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
             this.sprite.body.setVelocityX(-this.speed);
-            this.sprite.anims.play('walk-left', true);
+            this.sprite.anims.play('walk-right', true);
         } else if (this.cursors.up.isDown || this.wasd.up.isDown) {
             this.sprite.body.setVelocityY(-this.speed);
             this.sprite.anims.play('walk-up', true);
