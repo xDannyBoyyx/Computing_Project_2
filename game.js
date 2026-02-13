@@ -90,7 +90,9 @@ function create() {
 
 
 // Updating features and their technicality //to be added
+// Updating features and their technicality
 function update() {
-
+  if (this.player) {
+    this.player.update();
+  }
 }
-
