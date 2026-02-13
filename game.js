@@ -42,6 +42,10 @@ function preload() {
   this.load.image('grassTiles', 'assets/GRASS+.png');
 }   
 
+function preload() {
+  this.load.image('assets/char_a_p1_0bas_humn_v00.png');
+}
+
 
 // Creating features including the map and assets
 function create() {
