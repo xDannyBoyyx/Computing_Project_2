@@ -43,7 +43,7 @@ function preload() {
 }   
 
 function preload() {
-  this.load.spritesheet('player', 'assets/char_a_p1_0bas_humn_v00.png');
+  this.load.spritesheet('player', 'assets/char_a_p1_0bas_humn_v00.png', {
     frameWidth: 64,
     frameHeight: 64
   });
