@@ -38,7 +38,7 @@ const game = new Phaser.Game(config);
 
 // Preloading images (background map and teh character
 function preload() {
-  this.load.tilemapTiledJSON('mapJson', 'map.json');
+  // this.load.tilemapTiledJSON('mapJson', 'map.json');
   this.load.image('grassTiles', 'assets/GRASS+.png');
 
   this.load.spritesheet('player', 'assets/char_a_p1_0bas_humn_v00.png', {
@@ -48,9 +48,11 @@ function preload() {
 }
 
 function create() {
-  const map = this.make.tilemap({ key: 'mapJson' });
-  const tileset = map.addTilesetImage('grass', 'grassTiles');
-  map.createLayer('Background', tileset, 0, 0); 
+
+  this.add.tileSprite(0, 0, 4000, 4000, 'grassTiles').setOrigin(0,0);
+  // const map = this.make.tilemap({ key: 'mapJson' });
+  // const tileset = map.addTilesetImage('grass', 'grassTiles');
+  // map.createLayer('Background', tileset, 0, 0); 
 
   
   this.anims.create({
@@ -81,13 +83,13 @@ function create() {
     repeat: -1
   });
   
-  // puts the character at position (320, 180) - center of the screen
-  this.player = new Player(this, 320, 180);
+  // puts the character at position (2000, 2000) - center of the screen
+  this.player = new Player(this, 2000, 2000);
 
   this.cameras.main.startFollow(this.player.sprite);
 
-  this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16); //40 tiles wide, 25 tiles tall, 16 pixels.
-  this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
+  // this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16); //40 tiles wide, 25 tiles tall, 16 pixels.
+  // this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
   
   // this.player.sprite.setCollideWorldBounds(true);
 }
