@@ -42,19 +42,24 @@ function preload() {
   this.load.image('grassTiles', 'assets/GRASS+.png');
 }   
 
+// ADD THIS: Load player spritesheet
+  this.load.spritesheet('player', 'assets/sprites/player.png', {
+    frameWidth: 64,
+    frameHeight: 64
+  });
+}
+
 // Creating features including the map and assets
 function create() {
   const map = this.make.tilemap({ key: 'mapJson' });
-
   const tileset = map.addTilesetImage('grass', 'grassTiles');
-
   map.createLayer('Background', tileset, 0, 0); 
 } 
 
-// Updating features and their technicality
-function update() {
+// Updating features and their technicality //to be added
+// function update() {
 
-}
+// }
 
 
 
@@ -92,16 +97,22 @@ create() {
         repeat: -1
     });
     
-    this.player = new Player(this, 400, 300);
+    this.player = new Player(this, 320, 180);
+}
+
+// Updating features and their technicality
+function update() {
+  // ADD THIS: Update player
+  if (this.player) {
+    this.player.update();
+  }
 }
 
 
-
-
-preload() {
-    this.load.spritesheet('player', 'assets/sprites/player.png', {
-        frameWidth: 64,  // the sprite looks like 64x64
-        frameHeight: 64
-    });
-}
+// preload() {
+//     this.load.spritesheet('player', 'assets/sprites/player.png', {
+//         frameWidth: 64,  // the sprite looks like 64x64
+//         frameHeight: 64
+//     });
+// }
 
