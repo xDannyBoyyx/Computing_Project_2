@@ -2,7 +2,7 @@
 
 // Configuration for the game and how it works
 
-import { Player } from './player.js'; // this imports the player into the map
+// import { Player } from './player.js'; // this imports the player into the map
 
 const config = {
   type: Phaser.AUTO,
@@ -57,56 +57,56 @@ function create() {
 } 
 
 // Updating features and their technicality //to be added
-// function update() {
+function update() {
 
+}
+
+
+
+
+// create() {
+//     // Walking down (row 4)
+//     this.anims.create({
+//         key: 'walk-down',
+//         frames: this.anims.generateFrameNumbers('player', { start: 32, end: 39 }),
+//         frameRate: 10,
+//         repeat: -1
+//     });
+    
+//     // Walking up (row 5)
+//     this.anims.create({
+//         key: 'walk-up',
+//         frames: this.anims.generateFrameNumbers('player', { start: 40, end: 47 }),
+//         frameRate: 10,
+//         repeat: -1
+//     });
+    
+//     // Walking left (row 6)
+//     this.anims.create({
+//         key: 'walk-left',
+//         frames: this.anims.generateFrameNumbers('player', { start: 48, end: 55 }),
+//         frameRate: 10,
+//         repeat: -1
+//     });
+    
+//     // Walking right (row 7)
+//     this.anims.create({
+//         key: 'walk-right',
+//         frames: this.anims.generateFrameNumbers('player', { start: 56, end: 63 }),
+//         frameRate: 10,
+//         repeat: -1
+//     });
+    
+//     this.player = new Player(this, 320, 180);
 // }
 
-
-
-
-create() {
-    // Walking down (row 4)
-    this.anims.create({
-        key: 'walk-down',
-        frames: this.anims.generateFrameNumbers('player', { start: 32, end: 39 }),
-        frameRate: 10,
-        repeat: -1
-    });
-    
-    // Walking up (row 5)
-    this.anims.create({
-        key: 'walk-up',
-        frames: this.anims.generateFrameNumbers('player', { start: 40, end: 47 }),
-        frameRate: 10,
-        repeat: -1
-    });
-    
-    // Walking left (row 6)
-    this.anims.create({
-        key: 'walk-left',
-        frames: this.anims.generateFrameNumbers('player', { start: 48, end: 55 }),
-        frameRate: 10,
-        repeat: -1
-    });
-    
-    // Walking right (row 7)
-    this.anims.create({
-        key: 'walk-right',
-        frames: this.anims.generateFrameNumbers('player', { start: 56, end: 63 }),
-        frameRate: 10,
-        repeat: -1
-    });
-    
-    this.player = new Player(this, 320, 180);
-}
-
-// Updating features and their technicality
-function update() {
-  // ADD THIS: Update player
-  if (this.player) {
-    this.player.update();
-  }
-}
+// // Updating features and their technicality
+// function update() {
+//   // ADD THIS: Update player
+//   if (this.player) {
+//     this.player.update();
+//   }
+// }
 
 
 // preload() {
