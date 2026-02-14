@@ -55,7 +55,7 @@ function create() {
 
   for(let row = 0; row < 3; row++) {
     for(let col= 0; col <3; col++) {
-  map.createLayer('Background', tileset, col * 40 * 16, row * 25 * 16); 
+      const layer = map.createLayer('Background', tileset, col * 640, row * 400);
     }
   }
 
@@ -90,11 +90,9 @@ function create() {
   
   // puts the character at position (320, 200) - center of the screen
   this.player = new Player(this, 320, 200);
-
   this.cameras.main.startFollow(this.player.sprite);
-
-  this.cameras.main.setBounds(0, 0, 3 * 40 * 16, 3 * 25 * 16); //40 tiles wide, 25 tiles tall, 16 pixels. 3x bigger now.
-  this.physics.world.setBounds(0, 0, 3 * 40 * 16, 3 * 25 * 16);
+  this.cameras.main.setBounds(0, 0, 3 * 640, 3 * 400); //40 tiles wide, 25 tiles tall, 16 pixels. 3x bigger now.
+  this.physics.world.setBounds(0, 0, 3 * 640, 3 * 400);
   
   this.player.sprite.setCollideWorldBounds(true);
 }
