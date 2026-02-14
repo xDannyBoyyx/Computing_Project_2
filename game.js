@@ -6,8 +6,8 @@ import { Player } from './player.js'; // imports the user
 
 const config = {
   type: Phaser.AUTO,
-  width: 1280,
-  height: 720,
+  width: 640,
+  height: 360,
 
   physics: {
     default: 'arcade',
