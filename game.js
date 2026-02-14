@@ -52,7 +52,12 @@ function create() {
   // this.add.tileSprite(0, 0, 4000, 4000, 'grassTiles').setOrigin(0,0);
   const map = this.make.tilemap({ key: 'mapJson' });
   const tileset = map.addTilesetImage('grass', 'grassTiles');
-  map.createLayer('Background', tileset, 0, 0); 
+
+  for(let row = 0; row < 3; row++) {
+    for(let col= 0; col <3; col++) {
+  map.createLayer('Background', tileset, col * 40 * 16, row * 25 * 16); 
+    }
+  }
 
   
   this.anims.create({
@@ -83,7 +88,7 @@ function create() {
     repeat: -1
   });
   
-  // puts the character at position (2000, 2000) - center of the screen
+  // puts the character at position (320, 200) - center of the screen
   this.player = new Player(this, 320, 200);
 
   this.cameras.main.startFollow(this.player.sprite);
