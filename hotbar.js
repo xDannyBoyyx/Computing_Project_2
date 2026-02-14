@@ -13,8 +13,8 @@ export class Hotbar {
         // Create 5 slots
         for (let i = 0; i < 10; i++) {
         // Position: spread across bottom of screen
-        let x = 170 + (i * 40); // adjusted to center better
-        let y = 340; // adjusted position
+        let x = 160 + (i * 40); // adjusted to center better
+        let y = 320; // adjusted position
         
         // Draw the slot box
         let slot = this.scene.add.rectangle(x, y, 35, 35, 0x444444);
@@ -33,7 +33,7 @@ export class Hotbar {
     }
     
     highlightSlot() {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 10; i++) {
             this.slots[i].setStrokeStyle(3, 0xffffff);
         }
         
