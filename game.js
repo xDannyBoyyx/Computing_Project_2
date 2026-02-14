@@ -89,12 +89,12 @@ function create() {
   });
   
   // puts the character at position (320, 200) - center of the screen
-  this.player = new Player(this, 320, 200);
+  this.player = new Player(this, (3 * 40 * 16) / 2, (3 * 25 * 16) / 2;
 
   this.cameras.main.startFollow(this.player.sprite);
 
-  this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16); //40 tiles wide, 25 tiles tall, 16 pixels.
-  this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
+  this.cameras.main.setBounds(0, 0, 3 * 40 * 16, 3 * 25 * 16); //40 tiles wide, 25 tiles tall, 16 pixels. 3x bigger now.
+  this.physics.world.setBounds(0, 0, 3 * 40 * 16, 3 * 25 * 16);
   
   this.player.sprite.setCollideWorldBounds(true);
 }
