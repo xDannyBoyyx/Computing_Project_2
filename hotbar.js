@@ -11,18 +11,18 @@ export class Hotbar {
         this.slots = [];
         
         // Create 5 slots
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 10; i++) {
             // Position: spread across bottom of screen
-            let x = 220 + (i * 60); // spacing of 60 pixels
+            let x = 120 + (i * 40); // spacing of 60 pixels
             let y = 330; // near bottom
             
             // Draw the slot box
-            let slot = this.scene.add.rectangle(x, y, 50, 50, 0x444444);
-            slot.setStrokeStyle(3, 0xffffff);
+            let slot = this.scene.add.rectangle(x, y, 35, 35, 0x444444);
+            slot.setStrokeStyle(2, 0xffffff); // border colour
             slot.setScrollFactor(0); // Don't move with camera
             
             // Add number label
-            this.scene.add.text(x - 20, y - 20, i + 1, { fontSize: '16px' }).setScrollFactor(0);
+            this.scene.add.text(x - 15, y - 15, i + 1, { fontSize: '12px' }).setScrollFactor(0);
             
             this.slots.push(slot);
         }
