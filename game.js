@@ -52,12 +52,15 @@ function create() {
   // this.add.tileSprite(0, 0, 4000, 4000, 'grassTiles').setOrigin(0,0);
   const map = this.make.tilemap({ key: 'mapJson' });
   const tileset = map.addTilesetImage('grass', 'grassTiles');
+  map.createLayer('Background', tileset, 0, 0); 
 
-  for(let row = 0; row < 3; row++) {
-    for(let col= 0; col <3; col++) {
-      const layer = map.createLayer('Background', tileset, col * 640, row * 400);
-    }
-  }
+
+
+  // for(let row = 0; row < 3; row++) {
+  //   for(let col= 0; col <3; col++) {
+  //     const layer = map.createLayer('Background', tileset, col * 640, row * 400);
+  //   }
+  // }
 
   
   this.anims.create({
@@ -91,8 +94,8 @@ function create() {
   // puts the character at position (320, 200) - center of the screen
   this.player = new Player(this, 320, 200);
   this.cameras.main.startFollow(this.player.sprite);
-  this.cameras.main.setBounds(0, 0, 3 * 640, 3 * 400); //40 tiles wide, 25 tiles tall, 16 pixels. 3x bigger now.
-  this.physics.world.setBounds(0, 0, 3 * 640, 3 * 400);
+  this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16); //40 tiles wide, 25 tiles tall, 16 pixels. 3x bigger now.
+  this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
   
   this.player.sprite.setCollideWorldBounds(true);
 }
