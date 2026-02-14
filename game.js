@@ -3,6 +3,7 @@
 // Configuration for the game and how it works
 
 import { Player } from './player.js'; // imports the user
+import { Hotbar } from './hotbar.js'; //imports the hotbar
 
 const config = {
   type: Phaser.AUTO,
@@ -90,6 +91,8 @@ function create() {
   this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
   
   this.player.sprite.setCollideWorldBounds(true);
+
+  this.hotbar = new Hotbar(this);
 }
 
 function update() {
