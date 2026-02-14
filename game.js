@@ -49,18 +49,10 @@ function preload() {
 
 function create() {
 
-  // this.add.tileSprite(0, 0, 4000, 4000, 'grassTiles').setOrigin(0,0);
   const map = this.make.tilemap({ key: 'mapJson' });
   const tileset = map.addTilesetImage('grass', 'grassTiles');
   map.createLayer('Background', tileset, 0, 0); 
 
-
-
-  // for(let row = 0; row < 3; row++) {
-  //   for(let col= 0; col <3; col++) {
-  //     const layer = map.createLayer('Background', tileset, col * 640, row * 400);
-  //   }
-  // }
 
   
   this.anims.create({
