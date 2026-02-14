@@ -4,6 +4,7 @@
 
 import { Player } from './player.js'; // imports the user
 import { Hotbar } from './hotbar.js'; //imports the hotbar
+import { FarmManager } from './farmManager.js'; // imports the farming mechanics
 
 const config = {
   type: Phaser.AUTO,
@@ -54,7 +55,10 @@ function create() {
   const tileset = map.addTilesetImage('grass', 'grassTiles');
   map.createLayer('Background', tileset, 0, 0); 
 
-
+ 
+  // Hooks FarmManager into the game file
+  this.map = map;
+  this.farmManager = new FarmManager(this, map);
   
   this.anims.create({
     key: 'walk-down',
@@ -83,6 +87,51 @@ function create() {
     frameRate: 10,
     repeat: -1
   });
+   
+  // Adds mouse input
+  this.input.on('pointerdown', (pointer) => {
+    const worldPoint = pointer.positionToCamera(this.cameras.main);
+
+    const tile = worldToTileXY(worldPoint.x, worldPoint.y);
+
+    if (pointer.leftButtonDown()) {
+        this.handleFarmAction(tile.x, tile.y, "primary");
+    }
+
+    if (pointer.rightButtonDown()) {
+        this.handleFarmAction(tile.x, tile.y, "secondary");
+    }
+});
+
+
+  // Adds keyboard input
+  this.interactKey = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.E
+  );
+
+
+  // Farming interaction logic
+  this.handleFarmAction = (x, y, type) => {
+      const farm = this.farmManager;
+      const tile = farm.getTile(x, y);
+
+      if (type === "primary") {
+          // Till → Plant → Harvest
+          if (!tile.tilled) {
+              farm.till(x, y);
+          } else if (!tile.crop) {
+              farm.plant(x, y, "wheat");
+          } else {
+              console.log("Harvest not implemented yet");
+          }
+      }
+
+      if (type === "secondary") {
+          // Watering
+          farm.water(x, y);
+      }
+  };
+
   
   // puts the character at position (320, 200) - center of the screen
   this.player = new Player(this, 320, 200);
@@ -99,6 +148,23 @@ function update() {
   if(this.player) {
     this.player.update();
   }
+
+  if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+    const player = this.player.sprite;
+
+    const tile = worldToTileXY(player.x, player.y);
+
+    this.handleFarmAction(tile.x, tile.y, "primary");
+  }
+}
+
+// Converts the mouse position into a tile coordinate.
+function worldToTileXY(worldX, worldY) {
+  const tileSize = 16;
+  return {
+    x: Math.floor(worldX / tileSize),
+    y: Math.floor(worldY / tileSize)
+  };
 }
 
 
