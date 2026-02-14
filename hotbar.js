@@ -1,7 +1,7 @@
 export class Hotbar {
     constructor(scene) {
         this.scene = scene;
-        this.selectedSlot = 0; // Which slot is selected (0-4)
+        this.selectedSlot = 0;
         
         this.createSlots();
         this.setupKeys();
@@ -10,25 +10,22 @@ export class Hotbar {
     createSlots() {
         this.slots = [];
         
-        // Create 5 slots
+        // creates 10 slots
         for (let i = 0; i < 10; i++) {
-        // Position: spread across bottom of screen
-        let x = 160 + (i * 40); // adjusted to center better
-        let y = 320; // adjusted position
+        let x = 140 + (i * 40);
+        let y = 330;
         
-        // Draw the slot box
         let slot = this.scene.add.rectangle(x, y, 35, 35, 0x444444);
         slot.setStrokeStyle(2, 0xffffff);
         slot.setScrollFactor(0);
         
-        // Add number label (show 0 for last slot)
         let label = i === 9 ? '0' : (i + 1).toString();
         this.scene.add.text(x - 15, y - 15, label, { fontSize: '12px' }).setScrollFactor(0)
             
             this.slots.push(slot);
         }
         
-        // Highlight first slot
+        // highlights first slot
         this.highlightSlot();
     }
     
