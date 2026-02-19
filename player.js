@@ -1,6 +1,7 @@
 export class Player {
     constructor(scene, x, y) {
         this.scene = scene;
+        // Did this.scene = scene but not this.x = x and this.y = y?
         
         // adds the correct character sprite from the spritesheet
         this.sprite = scene.physics.add.sprite(x, y, 'player');
@@ -16,6 +17,8 @@ export class Player {
         });
     }
     
+    // !!! Please leave comments for what the different functionalities do !!! -D
+
     update() {
         this.sprite.body.setVelocity(0);
         
@@ -33,6 +36,8 @@ export class Player {
             this.sprite.anims.play('walk-down', true);
         } else {
             this.sprite.anims.stop();
-        }
+        } // I think personally this line above ^ is whats causing the sprite look as if its constantly still
+        // when only tapping the movement keys rather than holding them, also maybe use a switch statement to make 
+        // it look better and per chance work better but do compare and document. -D
     }
 }

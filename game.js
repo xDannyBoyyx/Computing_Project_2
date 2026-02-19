@@ -1,43 +1,5 @@
 // Where the game will work together
 
-// Configuration for the game and how it works
-
-import { Player } from './player.js'; // imports the user
-import { Hotbar } from './hotbar.js'; //imports the hotbar
-import { FarmManager } from './farmManager.js'; // imports the farming mechanics
-
-const config = {
-  type: Phaser.AUTO,
-  width: 640,
-  height: 360,
-
-  physics: {
-    default: 'arcade',
-    arcade: {
-      // gravity: { y: 0 },
-      debug: false //could change to true when debugging
-    }
-  },
-
-  render: {
-    pixelArt: true
-  },
-
-  scale: {
-    mode: Phaser.Scale.FIT, // May change to fit better
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  },
-
-  scene: {
-    preload: preload,
-    create: create,
-    update: update
-  }
-};
-
-// Creating it via Phaser
-const game = new Phaser.Game(config);   
-
 // Preloading images (background map and teh character
 function preload() {
   this.load.tilemapTiledJSON('mapJson', 'map.json');
@@ -47,17 +9,25 @@ function preload() {
     frameWidth: 64,
     frameHeight: 64
   });
-}
+} // End of preload
 
+import { Player } from './player.js'; // imports the user
+import { Hotbar } from './hotbar.js'; //imports the hotbar
+import { FarmManager } from './farmManager.js'; // imports the farming mechanics
+
+// Creating features or objects and applying them
 function create() {
 
   const map = this.make.tilemap({ key: 'mapJson' });
   const tileset = map.addTilesetImage('grass', 'grassTiles');
   map.createLayer('Background', tileset, 0, 0); 
-
  
   // Hooks FarmManager into the game file
   this.map = map;
+
+  // Couldn't everything below be technically placed in their own class/file?
+  // Not actually sure but just curious to then free up space and save confusion.
+
   this.farmManager = new FarmManager(this, map);
   
   this.anims.create({
@@ -93,6 +63,9 @@ function create() {
     const worldPoint = pointer.positionToCamera(this.cameras.main);
 
     const tile = worldToTileXY(worldPoint.x, worldPoint.y);
+
+    // Shouldn't both be left button down but rather checking whats currently in hand?
+    // Like a hoe or water bucket?
 
     if (pointer.leftButtonDown()) {
         this.handleFarmAction(tile.x, tile.y, "primary");
@@ -142,7 +115,8 @@ function create() {
   this.player.sprite.setCollideWorldBounds(true);
 
   this.hotbar = new Hotbar(this);
-}
+
+} // End of create
 
 function update() {
   if(this.player) {
@@ -156,7 +130,44 @@ function update() {
 
     this.handleFarmAction(tile.x, tile.y, "primary");
   }
-}
+
+} // End of update
+
+// Configuration for the game and how it works
+const config = {
+  type: Phaser.AUTO,
+  width: 640,
+  height: 360,
+
+  physics: {
+    default: 'arcade',
+    arcade: {
+      // gravity: { y: 0 },
+      debug: false //could change to true when debugging
+    }
+  },
+
+  render: {
+    pixelArt: true
+  },
+
+  scale: {
+    mode: Phaser.Scale.FIT, // May change to fit better
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
+
+  scene: {
+    preload: preload,
+    create: create,
+    update: update
+  }
+}; // End of config
+
+// Creating it via Phaser
+const game = new Phaser.Game(config);   
+
+// Does this VVV have to be a function? 
+// Can't it be simple math done in the constructors of the classes made?
 
 // Converts the mouse position into a tile coordinate.
 function worldToTileXY(worldX, worldY) {
@@ -166,8 +177,3 @@ function worldToTileXY(worldX, worldY) {
     y: Math.floor(worldY / tileSize)
   };
 }
-
-
-
-
-

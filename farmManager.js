@@ -1,6 +1,4 @@
-
 export class FarmManager {
-
 
     // Runs when the FarmManager is first created
     constructor(scene, map) {
@@ -89,7 +87,8 @@ export class FarmManager {
     }
 
     // Plant a crop on a tile
-    plant(x, y, cropType = "wheat") {
+    plant(x, y, plantType = "crop") {
+        // changed to plantType as it makes sense instead of only planting just "wheat". ^^
         const tile = this.getTile(x, y);
 
         // Only plant if:
@@ -99,12 +98,12 @@ export class FarmManager {
 
             // Create a crop object to track its growth
             tile.crop = {
-                type: cropType, // what crop it is (wheat, corn, etc)
+                type: plantType, // what crop it is (wheat, corn, etc)
                 growth: 0,      // how much it has grown so far
                 stage: 0        // which sprite stage it is at
             };
 
-            console.log("Planted", cropType, "at", x, y);
+            console.log("Planted", plantType, "at", x, y);
         }
     }
 }
