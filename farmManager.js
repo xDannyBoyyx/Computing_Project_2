@@ -1,16 +1,95 @@
 export class FarmManager {
 
-    // Runs when the FarmManager is first created
+    
     constructor(scene, map) {
-        this.scene = scene;   // reference to the Phaser scene (so we can draw things)
-        this.map = map;       // reference to the tilemap (not used that much right now)
+        this.scene = scene;   
+        this.map = map;       
 
         this.tileSize = 16;   // each tile is 16x16 pixels
 
         // Object that stores ALL farming data for each tile
         // Example key: "3,5" → tile at x=3, y=5
         this.tiles = {}; 
+
+        
+
+        // Sets up keyboard and mouse interaction
+        this.setupInput();
+
     }
+
+
+    setupInput() {
+        // Mouse input
+        this.scene.input.on('pointerdown', (pointer) => {
+            const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
+            const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
+
+            if (pointer.leftButtonDown()) {
+                this.handleFarmAction(tile.x, tile.y, "primary");
+            }
+
+            if (pointer.rightButtonDown()) {
+                this.handleFarmAction(tile.x, tile.y, "secondary");
+            }
+        });
+
+        // Keyboard input 
+        this.interactKey = this.scene.input.keyboard.addKey(
+            Phaser.Input.Keyboard.KeyCodes.E
+        );
+
+        
+    }
+
+     // can now call this inside game.js
+    update(player) {
+        if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+            const tile = this.worldToTileXY(player.sprite.x, player.sprite.y);
+            this.handleFarmAction(tile.x, tile.y, "primary");
+        }
+    }
+
+
+     // 
+    worldToTileXY(worldX, worldY) {
+        return {
+            x: Math.floor(worldX / this.tileSize),
+            y: Math.floor(worldY / this.tileSize)
+        };
+    }
+
+    // --- Farming logic ---
+    handleFarmAction(x, y, type) {
+        const tile = this.getTile(x, y);
+        const hotbar = this.scene.hotbar;
+        const tool = hotbar.getSelectedTool();
+        // Hoe must be highlighted in order for you to till soil
+        if (type === "primary") {
+            // Tilling
+            if ( tool === 'Hoe' && !tile.tilled) {
+                this.till(x, y);
+            
+            } 
+            else if ( tile.tilled && !tile.crop) {
+                this.plant(x, y, "wheat");
+
+            }
+            else if (tool === 'WateringCan' && tile.tilled) {
+                // Unsure whether it would be better to equip it in order to use, or just have it in the hotbar and you can right click. (potential QOL change?)
+                this.water(x, y);
+            } 
+            else {
+                console.log("Harvest not implemented yet");
+            }
+        }
+
+        
+        
+    }
+
+    
+  
 
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily
@@ -60,7 +139,7 @@ export class FarmManager {
                 0x6b4f2a     // brown colour
             );
 
-            rect.setDepth(10); // make sure it appears above the ground
+         
 
             // Save reference so we can change it later (watering, crops, etc.)
             tile.visual = rect;
@@ -106,4 +185,9 @@ export class FarmManager {
             console.log("Planted", plantType, "at", x, y);
         }
     }
+
+  
+
+ 
 }
+

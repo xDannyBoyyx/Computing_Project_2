@@ -4,6 +4,8 @@
 function preload() {
   this.load.tilemapTiledJSON('mapJson', 'map.json');
   this.load.image('grassTiles', 'assets/GRASS+.png');
+  this.load.image('Hoe', 'assets/Hoe.png');
+  this.load.image('WateringCan','assets/WateringCan.png');
 
   this.load.spritesheet('player', 'assets/char_a_p1_0bas_humn_v00.png', {
     frameWidth: 64,
@@ -25,10 +27,11 @@ function create() {
   // Hooks FarmManager into the game file
   this.map = map;
 
+  this.farmManager = new FarmManager(this, map);
   // Couldn't everything below be technically placed in their own class/file?
   // Not actually sure but just curious to then free up space and save confusion.
 
-  this.farmManager = new FarmManager(this, map);
+
   
   this.anims.create({
     key: 'walk-down',
@@ -58,52 +61,6 @@ function create() {
     repeat: -1
   });
    
-  // Adds mouse input
-  this.input.on('pointerdown', (pointer) => {
-    const worldPoint = pointer.positionToCamera(this.cameras.main);
-
-    const tile = worldToTileXY(worldPoint.x, worldPoint.y);
-
-    // Shouldn't both be left button down but rather checking whats currently in hand?
-    // Like a hoe or water bucket?
-
-    if (pointer.leftButtonDown()) {
-        this.handleFarmAction(tile.x, tile.y, "primary");
-    }
-
-    if (pointer.rightButtonDown()) {
-        this.handleFarmAction(tile.x, tile.y, "secondary");
-    }
-});
-
-
-  // Adds keyboard input
-  this.interactKey = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.E
-  );
-
-
-  // Farming interaction logic
-  this.handleFarmAction = (x, y, type) => {
-      const farm = this.farmManager;
-      const tile = farm.getTile(x, y);
-
-      if (type === "primary") {
-          // Till → Plant → Harvest
-          if (!tile.tilled) {
-              farm.till(x, y);
-          } else if (!tile.crop) {
-              farm.plant(x, y, "wheat");
-          } else {
-              console.log("Harvest not implemented yet");
-          }
-      }
-
-      if (type === "secondary") {
-          // Watering
-          farm.water(x, y);
-      }
-  };
 
   
   // puts the character at position (320, 200) - center of the screen
@@ -121,15 +78,10 @@ function create() {
 function update() {
   if(this.player) {
     this.player.update();
+    
   }
-
-  if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
-    const player = this.player.sprite;
-
-    const tile = worldToTileXY(player.x, player.y);
-
-    this.handleFarmAction(tile.x, tile.y, "primary");
-  }
+  
+  this.farmManager.update(this.player); // Hooks the farming interactions 
 
 } // End of update
 
@@ -166,14 +118,3 @@ const config = {
 // Creating it via Phaser
 const game = new Phaser.Game(config);   
 
-// Does this VVV have to be a function? 
-// Can't it be simple math done in the constructors of the classes made?
-
-// Converts the mouse position into a tile coordinate.
-function worldToTileXY(worldX, worldY) {
-  const tileSize = 16;
-  return {
-    x: Math.floor(worldX / tileSize),
-    y: Math.floor(worldY / tileSize)
-  };
-}

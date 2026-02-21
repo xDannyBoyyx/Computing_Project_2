@@ -2,6 +2,7 @@
 
 Game link: https://xdannyboyyx.github.io/Computing_Project_2/
 
+
 TO DO:
 
 ~~- ADD A GRASS BACKGROUND~~
@@ -21,3 +22,6 @@ TO DO:
 - ADD A SETTINGS SCREEN TO CHANGE VOLUME ETC
 - MISSCALANEOUS
 
+
+ASSETS & CREDITS: 
+Gardening tools: https://llenpix.itch.io/free-gardening-tools-assets-32x32

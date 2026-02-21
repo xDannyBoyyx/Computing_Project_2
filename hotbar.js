@@ -9,6 +9,7 @@ export class Hotbar {
     
     createSlots() {
         this.slots = [];
+        this.tools = [];  
         
         // creates 10 slots
         for (let i = 0; i < 10; i++) {
@@ -21,10 +22,26 @@ export class Hotbar {
         
         let label = i === 9 ? '0' : (i + 1).toString();
         this.scene.add.text(x - 15, y - 15, label, { fontSize: '12px' }).setScrollFactor(0)
-            
-            this.slots.push(slot);
-        }
         
+        
+         // Adds tool images (temporary implementation)
+        if (i === 0) {
+            let hoeImage = this.scene.add.image(x, y, 'Hoe').setScrollFactor(0);
+            hoeImage.setDisplaySize(28, 28); // scales it 
+            this.tools.push('Hoe');
+        }
+
+        else if (i === 1) {
+            let WCImage = this.scene.add.image(x, y, 'WateringCan').setScrollFactor(0);
+            WCImage.setDisplaySize(18,18)
+            this.tools.push('WateringCan');
+        } else{
+            this.tools.push(null)
+        }
+
+        this.slots.push(slot);
+
+        }
         // highlights first slot
         this.highlightSlot();
     }
@@ -54,5 +71,9 @@ export class Hotbar {
     selectSlot(slotNumber) {
         this.selectedSlot = slotNumber;
         this.highlightSlot();
+    }
+
+    getSelectedTool() {
+        return this.tools[this.selectedSlot];
     }
 }

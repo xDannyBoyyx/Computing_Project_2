@@ -36,8 +36,11 @@ export class Player {
             this.sprite.anims.play('walk-down', true);
         } else {
             this.sprite.anims.stop();
+
         } // I think personally this line above ^ is whats causing the sprite look as if its constantly still
         // when only tapping the movement keys rather than holding them, also maybe use a switch statement to make 
         // it look better and per chance work better but do compare and document. -D
+
+        this.sprite.setDepth(this.sprite.y); // Sets player depth
     }
 }
