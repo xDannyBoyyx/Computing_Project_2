@@ -13,7 +13,7 @@ export class Hotbar {
         
         // creates 10 slots
         for (let i = 0; i < 10; i++) {
-        let x = 170 + (i * 28);
+        let x = 180 + (i * 28);
         let y = 330;
         
         let slot = this.scene.add.rectangle(x, y, 24, 24, 0x444444);
