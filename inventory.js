@@ -3,14 +3,15 @@ export class Inventory {
         this.scene = scene;
         this.isOpen = false;
         this.slots = [];
-        this.items = new Array(30).fill(null); // 30 empty slots
+        this.items = new Array(30).fill(null);
+        this.itemSprites = new Array(30).fill(null);
         
         this.createInventory();
         this.setupControls();
+        this.setupDragDrop();
     }
     
     createInventory() {
-        // Container to hold everything
         this.container = this.scene.add.container(0, 0);
         this.container.setScrollFactor(0);
         this.container.setDepth(500);
@@ -30,7 +31,6 @@ export class Inventory {
         }).setOrigin(0.5);
         this.container.add(title);
         
-        // Creates 30 slots (3 rows, 10 columns)
         let startX = 155;
         let startY = 120;
         let slotSize = 32;
@@ -43,6 +43,7 @@ export class Inventory {
                 
                 let slot = this.scene.add.rectangle(x, y, slotSize, slotSize, 0x444444);
                 slot.setStrokeStyle(2, 0x888888);
+                slot.setData('slotIndex', row * 10 + col);
                 
                 this.container.add(slot);
                 this.slots.push(slot);
@@ -57,27 +58,120 @@ export class Inventory {
     }
     
     setupControls() {
-        // Press I to open inventory
         this.scene.input.keyboard.on('keydown-I', () => {
             this.toggle();
         });
     }
     
+    setupDragDrop() {
+        let draggedItem = null;
+        let originalX = 0;
+        let originalY = 0;
+        
+        // When dragging starts
+        this.scene.input.on('dragstart', (pointer, gameObject) => {
+            draggedItem = gameObject;
+            originalX = gameObject.x;
+            originalY = gameObject.y;
+            gameObject.setDepth(1000);
+        });
+        
+        // While dragging
+        this.scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            gameObject.x = pointer.x;
+            gameObject.y = pointer.y;
+        });
+        
+        // When dropping
+        this.scene.input.on('dragend', (pointer, gameObject) => {
+            let dropped = false;
+            
+            // Check if dropped on inventory slot
+            for (let i = 0; i < this.slots.length; i++) {
+                let slot = this.slots[i];
+                let bounds = slot.getBounds();
+                
+                if (Phaser.Geom.Rectangle.Contains(bounds, pointer.x, pointer.y)) {
+                    // Move item to inventory
+                    let itemKey = gameObject.texture.key;
+                    this.addItem(itemKey, i);
+                    
+                    // Remove from hotbar
+                    let fromSlot = gameObject.getData('slotIndex');
+                    this.scene.hotbar.removeItem(fromSlot);
+                    
+                    dropped = true;
+                    break;
+                }
+            }
+            
+            // Check if dropped on hotbar slot
+            if (!dropped) {
+                for (let i = 0; i < this.scene.hotbar.slots.length; i++) {
+                    let slot = this.scene.hotbar.slots[i];
+                    let bounds = slot.getBounds();
+                    
+                    if (Phaser.Geom.Rectangle.Contains(bounds, pointer.x, pointer.y)) {
+                        let itemKey = gameObject.texture.key;
+                        this.scene.hotbar.addItem(itemKey, i);
+                        
+                        // Remove from inventory if it came from there
+                        if (gameObject.getData('container') === 'inventory') {
+                            let fromSlot = gameObject.getData('slotIndex');
+                            this.removeItem(fromSlot);
+                        }
+                        
+                        dropped = true;
+                        break;
+                    }
+                }
+            }
+            
+            // If not dropped anywhere valid, return to original position
+            if (!dropped) {
+                gameObject.x = originalX;
+                gameObject.y = originalY;
+                gameObject.setDepth(101);
+            }
+        });
+    }
+    
+    addItem(itemKey, slotIndex) {
+        if (this.itemSprites[slotIndex]) {
+            this.itemSprites[slotIndex].destroy();
+        }
+        
+        this.items[slotIndex] = itemKey;
+        
+        let x = this.slots[slotIndex].x;
+        let y = this.slots[slotIndex].y;
+        
+        let sprite = this.scene.add.image(x, y, itemKey);
+        sprite.setScale(0.5);
+        sprite.setScrollFactor(0);
+        sprite.setDepth(501);
+        sprite.setInteractive({ draggable: true });
+        sprite.setData('slotIndex', slotIndex);
+        sprite.setData('container', 'inventory');
+        
+        this.container.add(sprite);
+        this.itemSprites[slotIndex] = sprite;
+    }
+    
+    removeItem(slotIndex) {
+        if (this.itemSprites[slotIndex]) {
+            this.itemSprites[slotIndex].destroy();
+            this.itemSprites[slotIndex] = null;
+        }
+        this.items[slotIndex] = null;
+    }
+    
     toggle() {
         this.isOpen = !this.isOpen;
         this.container.setVisible(this.isOpen);
-
-        //toggle to show or hide the hotbar when you have the invetory opened
+        
         if (this.scene.hotbar) {
             this.scene.hotbar.setVisible(this.isOpen);
         }
-    }
-    
-    addItem(item, slot) {
-        this.items[slot] = item;
-    }
-    
-    removeItem(slot) {
-        this.items[slot] = null;
     }
 }
