@@ -73,10 +73,10 @@ export class Hotbar {
         this.highlightSlot();
     }
 
-    setVisible(visible) {
-    // Show or hide all hotbar elements
-    this.slots.forEach(slot => slot.setVisible(visible));
-}
+//     setVisible(visible) {
+//     // Show or hide all hotbar elements
+//     this.slots.forEach(slot => slot.setVisible(visible));
+// }
 
     getSelectedTool() {
         return this.tools[this.selectedSlot];
