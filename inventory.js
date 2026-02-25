@@ -13,7 +13,7 @@ export class Inventory {
         // Container to hold everything
         this.container = this.scene.add.container(0, 0);
         this.container.setScrollFactor(0);
-        this.container.setDepth(200);
+        this.container.setDepth(500);
         this.container.setVisible(false);
         
         let overlay = this.scene.add.rectangle(320, 180, 640, 360, 0x000000, 0.7);
@@ -66,6 +66,11 @@ export class Inventory {
     toggle() {
         this.isOpen = !this.isOpen;
         this.container.setVisible(this.isOpen);
+
+        //toggle to show or hide the hotbar when you have the invetory opened
+        if (this.scene.hotbar) {
+            this.scene.hotbar.setVisible(this.isOpen);
+        }
     }
     
     addItem(item, slot) {
