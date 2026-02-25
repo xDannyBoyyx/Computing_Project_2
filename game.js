@@ -34,6 +34,7 @@ function preload() {
 import { Player } from './player.js'; // imports the user
 import { Hotbar } from './hotbar.js'; //imports the hotbar
 import { FarmManager } from './farmManager.js'; // imports the farming mechanics
+import { Inventory } from './inventory.js';
 
 // Creating features or objects and applying them
 function create() {
