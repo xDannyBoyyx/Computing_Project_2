@@ -13,15 +13,15 @@ export class Hotbar {
         
         // creates 10 slots
         for (let i = 0; i < 10; i++) {
-        let x = 170 + (i * 35);
+        let x = 170 + (i * 28);
         let y = 330;
         
-        let slot = this.scene.add.rectangle(x, y, 28, 28, 0x444444);
+        let slot = this.scene.add.rectangle(x, y, 24, 24, 0x444444);
         slot.setStrokeStyle(2, 0xffffff);
         slot.setScrollFactor(0);
         
         let label = i === 9 ? '0' : (i + 1).toString();
-        this.scene.add.text(x - 15, y - 15, label, { fontSize: '10px' }).setScrollFactor(0)
+        this.scene.add.text(x - 10, y - 10, label, { fontSize: '10px' }).setScrollFactor(0)
         
         
          // Adds tool images (temporary implementation)
