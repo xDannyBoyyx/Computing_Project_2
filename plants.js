@@ -1,28 +1,41 @@
 // This is where all plants including crops will work
 
 // Will finish it hopefully when i get back
-export class Plants {
-    constructor(scene, tileX, tileY){
+export class Plant {
+    constructor(scene, tileX, tileY, type){
         this.scene = scene;
         this.tileX = tileX; // grid position x
         this.tileY = tileY; // grid position y
+        this.type = type; // checking what type of plant it is
+
         this.worldX = tileX * 16; // world position x
-        this.worldY = tileY * 16; // world position x
-        // this.sprite = "image"; // for now not in use as i dont have image
+        this.worldY = tileY * 16; // world position y
 
-        // Temporary as i dont have image
-        const graphics = this.scene.add.graphics();
-        graphics.fillStyle(0xb6eabc); // Red fill
-        graphics.fillRect(0, 0, 100, 100); // Draw a 100x100 rectangle   
-        graphics.generateTexture('rectangleTexture', 100, 100);
+        if (type == "plant"){
+            this.startFrame = 568; // ID on the spritesheet (using tiled)
+            this.maxStages = 4;
 
-        this.sprite = (this.worldX, this.worldY, 'rectangleTexture'); 
-        this.scene.sprite.setOrigin(0.5, 1);
+            this.sprite = scene.add.sprite(
+                this.worldX + 8, // center x wise
+                this.worldY + 16, // center y wise
+                "smallPlant",
+                this.startFrame   // starting frame / plant stage
+            );
+        }
 
-        this.currentStage = 0;
-        this.growthTimer = 0;
-        this.maxStages = 4; // not sure so 4 for now
-        this.fullyGrown = false;
+        this.sprite.setOrigin(0.5, 1); // bottom middle of image
+
+        this.startFrame; // What plant it'll be from the spritesheet
+        this.currentStage = 0; // The growth stage
+        this.growthTimer = 0; // Timer that it'll use to grow real time
+        this.maxStages; // Depending on the plants
+        this.fullyGrown = false; // Only started growing so no
+
+        // this.growthSpeed = 5000; // 5 seconds for an example
+        // this.growthModifier = 1; // how it affects the growth speed
+
+        // example if (growthTimer >= growthSpeed * growthModifer)
+        // modifier will change depending on the weather for example
     }
 
     update(time, delta){
@@ -42,10 +55,7 @@ export class Plants {
         this.currentStage += 1;
 
         if (this.currentStage >= this.maxStages){
-            // this.sprite = "current_frame + 1"; //unsure as i still dont have image
-
-            graphics.fillStyle(0x2ca438);
-
+            this.sprite = "";
         } else {
             // stop update or grow so its not contantly running in the background as the plant is fully grown?
             this.fullyGrown = true;

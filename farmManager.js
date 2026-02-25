@@ -1,6 +1,6 @@
-export class FarmManager {
+import { Plant } from "./plants.js";
 
-    
+export class FarmManager {
     constructor(scene, map) {
         this.scene = scene;   
         this.map = map;       
@@ -11,13 +11,9 @@ export class FarmManager {
         // Example key: "3,5" → tile at x=3, y=5
         this.tiles = {}; 
 
-        
-
         // Sets up keyboard and mouse interaction
         this.setupInput();
-
     }
-
 
     setupInput() {
         // Mouse input
@@ -26,20 +22,20 @@ export class FarmManager {
             const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
 
             if (pointer.leftButtonDown()) {
-                this.handleFarmAction(tile.x, tile.y, "primary");
+                this.handleFarmAction(tile.x, tile.y);
             }
+            // got rid of the third parameter since it'll only be using left click
 
-            if (pointer.rightButtonDown()) {
-                this.handleFarmAction(tile.x, tile.y, "secondary");
-            }
+            // if (pointer.rightButtonDown()) {
+            //     this.handleFarmAction(tile.x, tile.y, "secondary");
+            // }
+            // i reckon using left click for everything will be easier
         });
 
         // Keyboard input 
         this.interactKey = this.scene.input.keyboard.addKey(
             Phaser.Input.Keyboard.KeyCodes.E
-        );
-
-        
+        );        
     }
 
      // can now call this inside game.js
@@ -50,8 +46,6 @@ export class FarmManager {
         }
     }
 
-
-     // 
     worldToTileXY(worldX, worldY) {
         return {
             x: Math.floor(worldX / this.tileSize),
@@ -60,36 +54,27 @@ export class FarmManager {
     }
 
     // --- Farming logic ---
-    handleFarmAction(x, y, type) {
+    handleFarmAction(x, y) {
         const tile = this.getTile(x, y);
         const hotbar = this.scene.hotbar;
         const tool = hotbar.getSelectedTool();
+
         // Hoe must be highlighted in order for you to till soil
-        if (type === "primary") {
-            // Tilling
-            if ( tool === 'Hoe' && !tile.tilled) {
-                this.till(x, y);
-            
-            } 
-            else if ( tile.tilled && !tile.crop) {
-                this.plant(x, y, "wheat");
-
-            }
-            else if (tool === 'WateringCan' && tile.tilled) {
-                // Unsure whether it would be better to equip it in order to use, or just have it in the hotbar and you can right click. (potential QOL change?)
-                this.water(x, y);
-            } 
-            else {
-                console.log("Harvest not implemented yet");
-            }
+        // Watering can must be highlighted for you to water soil after it being tilled
+        if ( tool === 'Hoe' && !tile.tilled) {
+            this.till(x, y);
+        } 
+        else if (tile.tilled && !tile.plant) {
+            this.plant(x, y, "plant");
         }
-
-        
-        
+        else if (tool === 'WateringCan' && tile.tilled) {
+            // Unsure whether it would be better to equip it in order to use, or just have it in the hotbar and you can right click. (potential QOL change?)
+            this.water(x, y);
+        }
+        else {
+            console.log("Harvest not implemented yet");
+        }
     }
-
-    
-  
 
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily
@@ -139,12 +124,10 @@ export class FarmManager {
                 0x6b4f2a     // brown colour
             );
 
-         
-
             // Save reference so we can change it later (watering, crops, etc.)
             tile.visual = rect;
 
-            console.log("Tile tilled:", x, y);
+            console.log("Tile tilled:", x, y); // to check if its working
         }
     }
 
@@ -166,28 +149,19 @@ export class FarmManager {
     }
 
     // Plant a crop on a tile
-    plant(x, y, plantType = "crop") {
-        // changed to plantType as it makes sense instead of only planting just "wheat". ^^
+    plant(x, y, plantType) {
         const tile = this.getTile(x, y);
 
         // Only plant if:
         // - tile is tilled
+        // - tile is watered
         // - there is no crop already there
-        if (tile.tilled && !tile.crop) {
-
+        if (tile.tilled && !tile.plant) {
             // Create a crop object to track its growth
-            tile.crop = {
-                type: plantType, // what crop it is (wheat, corn, etc)
-                growth: 0,      // how much it has grown so far
-                stage: 0        // which sprite stage it is at
-            };
+            tile.plant = new Plant(this.scene, x, y, plantType);
 
             console.log("Planted", plantType, "at", x, y);
         }
     }
-
-  
-
- 
 }
 

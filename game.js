@@ -11,6 +11,24 @@ function preload() {
     frameWidth: 64,
     frameHeight: 64
   });
+
+
+  // need to work on adapting to the different tile sizes VVV, for me -D
+  this.load.spritesheet("smallPlant", "assets/Plants.png", {
+    frameWidth: 16,
+    frameHeight: 32
+  });
+
+  this.load.spritesheet("mediumPlant", "assets/Plants.png", {
+    frameWidth: 32,
+    frameHeight: 32
+  });
+
+  this.load.spritesheet("largePlant", "assets/Plants.png", {
+    frameWidth: 32,
+    frameHeight: 48
+  });
+
 } // End of preload
 
 import { Player } from './player.js'; // imports the user
@@ -31,8 +49,6 @@ function create() {
   // Couldn't everything below be technically placed in their own class/file?
   // Not actually sure but just curious to then free up space and save confusion.
 
-
-  
   this.anims.create({
     key: 'walk-down',
     frames: this.anims.generateFrameNumbers('player', { start: 32, end: 39 }),
@@ -60,8 +76,6 @@ function create() {
     frameRate: 10,
     repeat: -1
   });
-   
-
   
   // puts the character at position (320, 200) - center of the screen
   this.player = new Player(this, 320, 200);
@@ -78,11 +92,9 @@ function create() {
 function update() {
   if(this.player) {
     this.player.update();
-    
   }
   
   this.farmManager.update(this.player); // Hooks the farming interactions 
-
 } // End of update
 
 // Configuration for the game and how it works
@@ -90,18 +102,18 @@ const config = {
   type: Phaser.AUTO,
   width: 640,
   height: 360,
-
+  pixelArt: true,
   physics: {
     default: 'arcade',
     arcade: {
       // gravity: { y: 0 },
-      debug: false //could change to true when debugging
+      debug: true //could change to true when debugging
     }
   },
 
-  render: {
-    pixelArt: true
-  },
+  // render: {
+  //   pixelArt: true
+  // },
 
   scale: {
     mode: Phaser.Scale.FIT, // May change to fit better
@@ -117,4 +129,3 @@ const config = {
 
 // Creating it via Phaser
 const game = new Phaser.Game(config);   
-
