@@ -2,6 +2,8 @@ export class Hotbar {
     constructor(scene) {
         this.scene = scene;
         this.selectedSlot = 0;
+        this.items = new Array(10).fill(null); // Track items in each slot
+        this.itemSprites = []; // Visual sprites for items
         
         this.createSlots();
         this.setupKeys();
@@ -9,53 +11,42 @@ export class Hotbar {
     
     createSlots() {
         this.slots = [];
-        this.tools = [];  
+        this.itemSprites = [];
         
-        // creates 10 slots
+        let slotSize = 24;
+        let spacing = 28;
+        let totalSlots = 10;
+        
+        let totalWidth = totalSlots * spacing;
+        let startX = (this.scene.cameras.main.width - totalWidth) / 2 + (spacing / 2);
+        
         for (let i = 0; i < 10; i++) {
-        let x = 190 + (i * 28);
-        let y = 330;
-        
-        let slot = this.scene.add.rectangle(x, y, 24, 24, 0x444444);
-        slot.setStrokeStyle(2, 0xffffff);
-        slot.setScrollFactor(0);
-        
-        let label = i === 9 ? '0' : (i + 1).toString();
-        this.scene.add.text(x - 10, y - 10, label, { fontSize: '10px' }).setScrollFactor(0)
-        
-        
-         // Adds tool images (temporary implementation)
-        if (i === 0) {
-            let hoeImage = this.scene.add.image(x, y, 'Hoe').setScrollFactor(0);
-            hoeImage.setDisplaySize(28, 28); // scales it 
-            this.tools.push('Hoe');
+            let x = startX + (i * spacing);
+            let y = 345;
+            
+            let slot = this.scene.add.rectangle(x, y, slotSize, slotSize, 0x444444);
+            slot.setStrokeStyle(2, 0xffffff);
+            slot.setScrollFactor(0);
+            slot.setDepth(100);
+            
+            let label = i === 9 ? '0' : (i + 1).toString();
+            this.scene.add.text(x - 10, y - 10, label, { fontSize: '10px' }).setScrollFactor(0).setDepth(100);
+            
+            this.slots.push(slot);
+            this.itemSprites.push(null); // No item initially
         }
-
-        else if (i === 1) {
-            let WCImage = this.scene.add.image(x, y, 'WateringCan').setScrollFactor(0);
-            WCImage.setDisplaySize(18,18)
-            this.tools.push('WateringCan');
-        } else{
-            this.tools.push(null)
-        }
-
-        this.slots.push(slot);
-
-        }
-        // highlights first slot
+        
         this.highlightSlot();
     }
     
     highlightSlot() {
         for (let i = 0; i < 10; i++) {
-            this.slots[i].setStrokeStyle(3, 0xffffff);
+            this.slots[i].setStrokeStyle(2, 0xffffff);
         }
-        
-        this.slots[this.selectedSlot].setStrokeStyle(3, 0xffff00);
+        this.slots[this.selectedSlot].setStrokeStyle(2, 0xffff00);
     }
     
     setupKeys() {
-        // press 1-10 to select slots
         this.scene.input.keyboard.on('keydown-ONE', () => this.selectSlot(0));
         this.scene.input.keyboard.on('keydown-TWO', () => this.selectSlot(1));
         this.scene.input.keyboard.on('keydown-THREE', () => this.selectSlot(2));
@@ -72,13 +63,43 @@ export class Hotbar {
         this.selectedSlot = slotNumber;
         this.highlightSlot();
     }
-
-//     setVisible(visible) {
-//     // Show or hide all hotbar elements
-//     this.slots.forEach(slot => slot.setVisible(visible));
-// }
-
-    getSelectedTool() {
-        return this.tools[this.selectedSlot];
+    
+    addItem(itemKey, slotIndex) {
+        // Remove old item sprite if exists
+        if (this.itemSprites[slotIndex]) {
+            this.itemSprites[slotIndex].destroy();
+        }
+        
+        // Add new item
+        this.items[slotIndex] = itemKey;
+        
+        // Create sprite for the item
+        let x = this.slots[slotIndex].x;
+        let y = this.slots[slotIndex].y;
+        
+        let sprite = this.scene.add.image(x, y, itemKey);
+        sprite.setScale(0.4); // Scale down to fit in slot
+        sprite.setScrollFactor(0);
+        sprite.setDepth(101);
+        sprite.setInteractive({ draggable: true });
+        sprite.setData('slotIndex', slotIndex);
+        sprite.setData('container', 'hotbar');
+        
+        this.itemSprites[slotIndex] = sprite;
+    }
+    
+    removeItem(slotIndex) {
+        if (this.itemSprites[slotIndex]) {
+            this.itemSprites[slotIndex].destroy();
+            this.itemSprites[slotIndex] = null;
+        }
+        this.items[slotIndex] = null;
+    }
+    
+    setVisible(visible) {
+        this.slots.forEach(slot => slot.setVisible(visible));
+        this.itemSprites.forEach(sprite => {
+            if (sprite) sprite.setVisible(visible);
+        });
     }
 }
