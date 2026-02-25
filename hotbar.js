@@ -13,10 +13,10 @@ export class Hotbar {
         
         // creates 10 slots
         for (let i = 0; i < 10; i++) {
-        let x = 140 + (i * 40);
+        let x = 170 + (i * 32);
         let y = 330;
         
-        let slot = this.scene.add.rectangle(x, y, 35, 35, 0x444444);
+        let slot = this.scene.add.rectangle(x, y, 28, 28, 0x444444);
         slot.setStrokeStyle(2, 0xffffff);
         slot.setScrollFactor(0);
         
