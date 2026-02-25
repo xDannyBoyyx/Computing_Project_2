@@ -24,15 +24,15 @@ export class Inventory {
         panel.setStrokeStyle(3, 0xffffff);
         this.container.add(panel);
         
-        let title = this.scene.add.text(320, 70, 'INVENTORY', {
+        let title = this.scene.add.text(320, 85, 'INVENTORY', {
             fontSize: '20px',
             color: '#ffffff'
         }).setOrigin(0.5);
         this.container.add(title);
         
         // Creates 30 slots (3 rows, 10 columns)
-        let startX = 135;
-        let startY = 110;
+        let startX = 155;
+        let startY = 120;
         let slotSize = 32;
         let spacing = 37;
         
