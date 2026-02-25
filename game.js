@@ -88,6 +88,8 @@ function create() {
 
   this.hotbar = new Hotbar(this);
 
+  this.inventory = new Inventory(this);
+
 } // End of create
 
 function update() {
