@@ -102,7 +102,7 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
-  scene: [MainMenu, GameScene]
+  scene: [MainMenu, GameScene] //Switch MainMenu & GameScene if you don't want to see the main menu every time.
 };
 
 const game = new Phaser.Game(config);   
