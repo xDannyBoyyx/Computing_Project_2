@@ -4,27 +4,6 @@ import { FarmManager } from './farmManager.js';
 import { Inventory } from './inventory.js';
 import { MainMenu } from './mainMenu.js';
 
-const config = {
-  type: Phaser.AUTO,
-  width: 640,
-  height: 360,
-  pixelArt: true,
-  physics: {
-    default: 'arcade',
-    arcade: {
-      debug: true
-    }
-  },
-  scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  },
-  scene: [MainMenu, GameScene]
-};
-
-// Creating it via Phaser
-const game = new Phaser.Game(config);
-
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
@@ -106,4 +85,24 @@ class GameScene extends Phaser.Scene {
     
     this.farmManager.update(this.player, time, delta);
   }
-}   
+}
+
+const config = {
+  type: Phaser.AUTO,
+  width: 640,
+  height: 360,
+  pixelArt: true,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      debug: true
+    }
+  },
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH
+  },
+  scene: [MainMenu, GameScene]
+};
+
+const game = new Phaser.Game(config);   
