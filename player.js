@@ -41,6 +41,6 @@ export class Player {
         // when only tapping the movement keys rather than holding them, also maybe use a switch statement to make 
         // it look better and per chance work better but do compare and document. -D
 
-        this.sprite.setDepth(this.sprite.y); // Sets player depth
+        this.sprite.setDepth(this.sprite.y + 20); // Sets player depth
     }
 }
