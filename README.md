@@ -24,11 +24,15 @@ TO DO:
 ~~- ADD ABILITY TO PLANT ON THE GROUND WHERE A HOE HAS BEEN USED~~
 
 - ADD WEATHER PATTERNS
-- ADD A MAIN MENU (START GANE, SETTINGS, EXIT)
+  
+~~- ADD A MAIN MENU (START GANE, SETTINGS, EXIT)~~
+
 - ADD A SETTINGS SCREEN TO CHANGE VOLUME ETC
+  
 - MISSCALANEOUS
 
 
 ASSETS & CREDITS: 
 
-Gardening tools: https://llenpix.itch.io/free-gardening-tools-assets-32x32
+Gardening Tools: https://llenpix.itch.io/free-gardening-tools-assets-32x32
+Character Sprite: https://craftpix.net/freebies/free-base-4-direction-male-character-pixel-art/
