@@ -12,21 +12,21 @@ export class MainMenu extends Phaser.Scene {
         this.add.image(320, 180, 'menuScreen');
         
         // START button (adjust x, y, width, height to match the image)
-        let startButton = this.add.rectangle(320, 170, 420, 50, 0x000000, 0.5); // 0 alpha = invisible
+        let startButton = this.add.rectangle(320, 150, 400, 50, 0x000000, 0.5); // 0 alpha = invisible
         startButton.setInteractive({ useHandCursor: true });
         startButton.on('pointerdown', () => {
             this.scene.start('GameScene');
         });
         
         // OPTIONS button
-        let optionsButton = this.add.rectangle(320, 230, 420, 50, 0x000000, 0.5);
+        let optionsButton = this.add.rectangle(320, 210, 400, 50, 0x000000, 0.5);
         optionsButton.setInteractive({ useHandCursor: true });
         optionsButton.on('pointerdown', () => {
             console.log('Options clicked');
         });
         
         // EXIT button
-        let exitButton = this.add.rectangle(320, 290, 420, 50, 0x000000, 0.5);
+        let exitButton = this.add.rectangle(320, 270, 400, 50, 0x000000, 0.5);
         exitButton.setInteractive({ useHandCursor: true });
         exitButton.on('pointerdown', () => {
             window.close();
