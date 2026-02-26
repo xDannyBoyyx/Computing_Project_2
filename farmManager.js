@@ -11,6 +11,10 @@ export class FarmManager {
         // Example key: "3,5" → tile at x=3, y=5
         this.tiles = {}; 
 
+        // Stores the plants that are created when planting on the tile
+        // Done so that they can be accessed outside the plant function and update for example can be called
+        this.plantsArr = [];
+
         // Sets up keyboard and mouse interaction
         this.setupInput();
     }
@@ -24,12 +28,13 @@ export class FarmManager {
             if (pointer.leftButtonDown()) {
                 this.handleFarmAction(tile.x, tile.y);
             }
-            // got rid of the third parameter since it'll only be using left click
+            // got rid of the third parameter since it'll only be using left click -D
 
             // if (pointer.rightButtonDown()) {
             //     this.handleFarmAction(tile.x, tile.y, "secondary");
             // }
-            // i reckon using left click for everything will be easier
+
+            // i reckon using left click for everything will be easier -D
         });
 
         // Keyboard input 
@@ -39,10 +44,17 @@ export class FarmManager {
     }
 
      // can now call this inside game.js
-    update(player) {
+    update(player, time, delta) {
         if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
             const tile = this.worldToTileXY(player.sprite.x, player.sprite.y);
             this.handleFarmAction(tile.x, tile.y, "primary");
+        }
+
+        // For each plant inside the plant array, update them to ensure they can grow
+        // Will be updated to ensure that they check certain parameters like it being watered
+        // or certain weather conditions for example -D
+        for (var p of this.plantsArr){
+            p.update(time,delta);
         }
     }
 
@@ -61,10 +73,10 @@ export class FarmManager {
 
         // Hoe must be highlighted in order for you to till soil
         // Watering can must be highlighted for you to water soil after it being tilled
-        if ( tool === 'Hoe' && !tile.tilled) {
+        if (tool === 'Hoe' && !tile.tilled) {
             this.till(x, y);
         } 
-        else if (tile.tilled && !tile.plant) {
+        else if (tile.tilled && !tile.plant && !tool) { // eventually will check for seeds or smth instead of empty handed
             this.plant(x, y, "plant");
         }
         else if (tool === 'WateringCan' && tile.tilled) {
@@ -94,6 +106,7 @@ export class FarmManager {
                 tilled: false,     // has the player tilled the soil?
                 watered: false,    // has the tile been watered?
                 crop: null,        // what crop is planted here (if any)
+                depth: y,
                 fertility: 1.0     // how healthy the soil is (1 = normal, will expand later)
             };
         }
@@ -138,6 +151,7 @@ export class FarmManager {
         // Can only water tilled soil
         if (tile.tilled) {
             tile.watered = true;
+            console.log(tile);
 
             // Darkens the soil colour to show it's wet
             if (tile.visual) {
@@ -160,7 +174,9 @@ export class FarmManager {
             // Create a crop object to track its growth
             tile.plant = new Plant(this.scene, x, y, plantType);
 
-            console.log("Planted", plantType, "at", x, y);
+            this.plantsArr.push(tile.plant); // To access plants outside the function
+
+            // console.log("Planted", plantType, "at", x, y);
         }
     }
 }

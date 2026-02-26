@@ -12,22 +12,25 @@ function preload() {
     frameHeight: 64
   });
 
-
-  // need to work on adapting to the different tile sizes VVV, for me -D
-  this.load.spritesheet("smallPlant", "assets/Plants.png", {
+  // Below are the different images used for the different plants
+  // reason why there are multiple spritesheets is because we split up the original tileset
+  // and remade it to fit the different frame widths and heights better.
+  this.load.spritesheet("smallPlant", "assets/SmallPlants.png", {
     frameWidth: 16,
     frameHeight: 32
   });
 
-  this.load.spritesheet("mediumPlant", "assets/Plants.png", {
+  this.load.spritesheet("mediumPlant", "assets/MediumPlants.png", {
     frameWidth: 32,
     frameHeight: 32
   });
 
-  this.load.spritesheet("largePlant", "assets/Plants.png", {
+  this.load.spritesheet("largePlant", "assets/LargePlants.png", {
     frameWidth: 32,
-    frameHeight: 48
+    frameHeight: 40
   });
+
+  // When adding the trees, split them up and add them to the categories above - note to self - D
 
 } // End of preload
 
@@ -89,12 +92,12 @@ function create() {
 
 } // End of create
 
-function update() {
+function update(time, delta) {
   if(this.player) {
     this.player.update();
   }
   
-  this.farmManager.update(this.player); // Hooks the farming interactions 
+  this.farmManager.update(this.player, time, delta); // Hooks the farming interactions 
 } // End of update
 
 // Configuration for the game and how it works
@@ -103,6 +106,7 @@ const config = {
   width: 640,
   height: 360,
   pixelArt: true,
+
   physics: {
     default: 'arcade',
     arcade: {
@@ -110,10 +114,6 @@ const config = {
       debug: true //could change to true when debugging
     }
   },
-
-  // render: {
-  //   pixelArt: true
-  // },
 
   scale: {
     mode: Phaser.Scale.FIT, // May change to fit better
