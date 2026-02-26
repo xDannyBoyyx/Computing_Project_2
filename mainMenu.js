@@ -9,7 +9,7 @@ export class MainMenu extends Phaser.Scene {
     }
     
     create() {
-        this.add.image(320, 180, 'menuScreen');
+        this.add.image(320, 180, 'menuScreen').setDisplaySize(640, 360);
         
         // START button (adjust x, y, width, height to match the image)
         let startButton = this.add.rectangle(320, 170, 380, 50, 0x000000, 0.5); // 0 alpha = invisible
