@@ -66,27 +66,30 @@ export class FarmManager {
     }
 
     // --- Farming logic ---
-    handleFarmAction(x, y) {
-        const tile = this.getTile(x, y);
-        const hotbar = this.scene.hotbar;
-        const tool = hotbar.getSelectedTool();
+        handleFarmAction(x, y) {
+            if (this.scene.isUIOpen) return;
 
-        // Hoe must be highlighted in order for you to till soil
-        // Watering can must be highlighted for you to water soil after it being tilled
-        if (tool === 'Hoe' && !tile.tilled) {
-            this.till(x, y);
-        } 
-        else if (tile.tilled && !tile.plant && !tool) { // eventually will check for seeds or smth instead of empty handed
-            this.plant(x, y, "plant");
+            const tile = this.getTile(x, y);
+            const hotbar = this.scene.hotbar;
+            const tool = hotbar.getSelectedTool();
+
+            // Gets the tool type 
+            const toolType = tool?.type ?? null;
+
+            if (toolType === 'Hoe' && !tile.tilled) {
+                this.till(x, y);
+            } 
+            else if (tile.tilled && !tile.plant && !toolType) { 
+                // eventually check for seeds instead of empty handed
+                this.plant(x, y, "plant");
+            }
+            else if (toolType === 'WateringCan' && tile.tilled) {
+                this.water(x, y);
+            }
+            else {
+                console.log("Harvest not implemented yet");
+            }
         }
-        else if (tool === 'WateringCan' && tile.tilled) {
-            // Unsure whether it would be better to equip it in order to use, or just have it in the hotbar and you can right click. (potential QOL change?)
-            this.water(x, y);
-        }
-        else {
-            console.log("Harvest not implemented yet");
-        }
-    }
 
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily
