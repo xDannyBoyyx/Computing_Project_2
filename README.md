@@ -18,6 +18,16 @@ TO DO:
 ~~- ADD TOOLS (HOE, WATERING CAN, SCYTHE ETC)~~
 
 - ADD NPC WHICH SELL CROPS AND YOU CAN BUY FROM HIM
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Bugs/Fixes TO DO:
+1. You can drag an item on a slot which has a different item already.
+2. You can only sell items which are in your Inventory, you should be able to sell from hotbar as well.
+3. Dragging and dropping items in inventory or hotbar is a bit delayed and sometimes doesn't work.
+4. Selling items only gives you 5 gold instead of the 10 promised.
+5. Sometimes buying an item you can't move it from your inventory and it's just stuck.
+6. Sometimes you can't even buy an item from the shop even though you have enough Gold.
+7. Sometimes items duplicate and sell for different prices from the merchant.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ~~- ADD ABILITY TO FARM THE GROUND BY LEFT/RIGHT-CLICKING OR PRESSING A BUTTON~~
 
