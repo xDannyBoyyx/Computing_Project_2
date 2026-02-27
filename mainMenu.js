@@ -27,6 +27,7 @@ export class MainMenu extends Phaser.Scene {
         
         // EXIT button
         let exitButton = this.add.rectangle(315, 280, 165, 40, 0x000000, 0);
+        exitButton.setDepth(1000);
         exitButton.setInteractive({ useHandCursor: true });
         exitButton.on('pointerdown', () => {
             window.close();
