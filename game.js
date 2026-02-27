@@ -1,7 +1,7 @@
 import { Player } from './player.js';
 import { Hotbar } from './hotbar.js';
 import { FarmManager } from './farmManager.js';
-import { EconomyManager } from './economymanager.js';
+import { EconomyManager } from './economyManager.js';
 import { Inventory } from './inventory.js';
 import { MainMenu } from './mainMenu.js';
 import { Merchant } from './merchant.js';
