@@ -39,6 +39,7 @@ class GameScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 40
     });
+    this.load.audio("farmMusic", "assets/Magic Scout - Farm.mp3");
   }
   
   create() {
@@ -89,6 +90,12 @@ class GameScene extends Phaser.Scene {
     this.hotbar = new Hotbar(this);
     this.inventory = new Inventory(this);
     this.isUIOpen = false;
+
+    this.backgroundMusic = this.sound.add('farmMusic', {
+    volume: 0.5,   // 0.0 = silent & 1.0 = full volume
+    loop: true     // loop the song
+  });
+  this.backgroundMusic.play();
   }
   
   update(time, delta) {
