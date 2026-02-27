@@ -137,3 +137,5 @@ const config = {
 };
 
 const game = new Phaser.Game(config);   
+
+game.sound.pauseOnBlur = false; //this keeps the music playing when the tab is inactive
