@@ -129,6 +129,10 @@ const config = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
+  audio: {               
+    disableWebAudio: false, // this makes it so the music still plays when on another tab
+    noAudio: false
+  },
   scene: [MainMenu,GameScene] //Switch MainMenu & GameScene if you don't want to see the main menu every time.
 };
 
