@@ -29,6 +29,7 @@ Bugs/Fixes TO DO:
 5. Sometimes buying an item you can't move it from your inventory and it's just stuck.
 6. Sometimes you can't even buy an item from the shop even though you have enough Gold.
 7. Sometimes items duplicate and sell for different prices from the merchant.
+8. After opening up the Inventory you can drag an item anywhere on the screen.
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
