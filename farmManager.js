@@ -129,16 +129,24 @@ export class FarmManager {
             // We don't have many assets yet, so I'll draw a brown square for now
             // This shows the player the tile is tilled
 
-            const worldX = x * this.tileSize;
-            const worldY = y * this.tileSize;
+            // const worldX = x * this.tileSize;
+            // const worldY = y * this.tileSize;
 
-            const rect = this.scene.add.rectangle(
-                worldX + 8,  // center of tile
-                worldY + 8,
-                16,          // width
-                16,          // height
-                0x6b4f2a     // brown colour
-            );
+            // const rect = this.scene.add.rect(
+            //     worldX + 8,  // center of tile
+            //     worldY + 8,
+            //     16,          // width
+            //     16,          // height
+            //     0x6b4f2a     // brown colour
+            // );
+
+            // using the tileset and simply changing tiles instead
+            // might be out of scope but will want to implement a neighbor check
+            // this will ensure that the tilled tile doesn't look out of the blue and bends in
+            // could have greener sides as long as the neighbors aren't tilled as well.
+            const rect = this.map.putTileAt(77, // key
+                                            x, // x 
+                                            y); // y
 
             // Save reference so we can change it later (watering, crops, etc.)
             tile.visual = rect;

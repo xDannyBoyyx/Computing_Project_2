@@ -23,7 +23,7 @@ class GameScene extends Phaser.Scene {
     this.load.image('Scythe', 'assets/Scythe.png'); 
     this.load.image('Shovel', 'assets/Shovel.png');
     
-    this.load.spritesheet('player', 'assets/char_a_p1_0bas_humn_v00.png', {
+    this.load.spritesheet('player', 'assets/maleSS.png', {
       frameWidth: 64,
       frameHeight: 64
     });
@@ -47,36 +47,36 @@ class GameScene extends Phaser.Scene {
     const tileset = map.addTilesetImage('grass', 'grassTiles');
     map.createLayer('Background', tileset, 0, 0); 
    
-    this.map = map;
+    // this.map = map;
     this.farmManager = new FarmManager(this, map);
     this.economy = new EconomyManager(this, 100); 
     this.merchant = new Merchant(this);
      
     
     this.anims.create({
-      key: 'walk-down',
-      frames: this.anims.generateFrameNumbers('player', { start: 32, end: 39 }),
+      key: 'move-down',
+      frames: this.anims.generateFrameNumbers('player', {  frames: [15, 14, 13, 12, 0, 1, 2, 3] }),
       frameRate: 10,
       repeat: -1
     });
     
     this.anims.create({
-      key: 'walk-up',
-      frames: this.anims.generateFrameNumbers('player', { start: 40, end: 47 }),
+      key: 'move-up',
+      frames: this.anims.generateFrameNumbers('player', { frames: [4, 5, 6, 7, 11, 10, 9, 8] }),
       frameRate: 10,
       repeat: -1
     });
     
     this.anims.create({
-      key: 'walk-left',
-      frames: this.anims.generateFrameNumbers('player', { start: 56, end: 63 }),
+      key: 'move-left',
+      frames: this.anims.generateFrameNumbers('player', { frames: [31, 30, 29, 25, 28, 27, 26, 24] }),
       frameRate: 10,
       repeat: -1
     });
     
     this.anims.create({
-      key: 'walk-right',
-      frames: this.anims.generateFrameNumbers('player', { start: 48, end: 55 }),
+      key: 'move-right',
+      frames: this.anims.generateFrameNumbers('player', { frames: [16, 17, 18, 22, 19, 20, 21, 23] }),
       frameRate: 10,
       repeat: -1
     });

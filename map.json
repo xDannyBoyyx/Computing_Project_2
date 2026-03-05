@@ -113,6 +113,32 @@
              "rotate":true,
              "vflip":false
             }
+        }, 
+        {
+         "columns":32,
+         "firstgid":1647,
+         "image":"..\/..\/..\/Pictures\/Game assets\/Plant tilesets\/SmallTrees.png",
+         "imageheight":128,
+         "imagewidth":512,
+         "margin":0,
+         "name":"SmallTrees",
+         "spacing":0,
+         "tilecount":256,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":9,
+         "firstgid":1903,
+         "image":"..\/..\/..\/Pictures\/Game assets\/Plant tilesets\/SmallPlants.png",
+         "imageheight":128,
+         "imagewidth":144,
+         "margin":0,
+         "name":"SmallPlants",
+         "spacing":0,
+         "tilecount":72,
+         "tileheight":16,
+         "tilewidth":16
         }],
  "tilewidth":16,
  "type":"map",
