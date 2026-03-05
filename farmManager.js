@@ -3,7 +3,7 @@ import { Plant } from "./plants.js";
 export class FarmManager {
     constructor(scene, map) {
         this.scene = scene;   
-        this.map = map;       
+        this.map = map;    
 
         this.tileSize = 16;   // each tile is 16x16 pixels
 
@@ -166,7 +166,9 @@ export class FarmManager {
 
             // Darkens the soil colour to show it's wet
             if (tile.visual) {
-                tile.visual.setFillStyle(0x4e342e);
+                // tile.visual.setFillStyle(0x4e342e);
+
+                tile.visual.tint = 0xB8C0D0; //changing the tint to make it slightly darker / wet
             }
 
             console.log("Watered:", x, y);

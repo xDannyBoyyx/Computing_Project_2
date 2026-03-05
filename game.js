@@ -45,7 +45,7 @@ class GameScene extends Phaser.Scene {
   create() {
     const map = this.make.tilemap({ key: 'mapJson' });
     const tileset = map.addTilesetImage('grass', 'grassTiles');
-    map.createLayer('Background', tileset, 0, 0); 
+    const ground = map.createLayer('Background', tileset, 0, 0); 
    
     // this.map = map;
     this.farmManager = new FarmManager(this, map);
