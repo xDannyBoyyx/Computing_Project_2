@@ -5,7 +5,7 @@ export class Inventory {
         this.scene = scene;
         this.isOpen = false;
         this.slots = [];
-        this.items = new Array(30).fill(null); // 30 empty slots
+        this.items = new Array(30).fill(null); 
         
         this.createInventory();
         this.setupControls();
@@ -31,23 +31,35 @@ export class Inventory {
         }).setOrigin(0.5);
         this.container.add(title);
         
-        // 30 slots (3 rows × 10 columns)
-        let startX = 155;
-        let startY = 120;
-        let slotSize = 32;
-        let spacing = 37;
         
-        for (let row = 0; row < 3; row++) {
-            for (let col = 0; col < 10; col++) {
-                let x = startX + (col * spacing);
-                let y = startY + (row * spacing);
-                
+        // 30 slots (3 rows × 10 columns)
+
+        const cols = 10;
+        const rows = 3;
+
+        const slotSize = 36;
+        const spacing = 40;
+
+        const gridWidth = (cols - 1) * spacing;
+        const startX = 320 - gridWidth / 2;
+        const startY = 120;
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+
+                let x = startX + col * spacing;
+                let y = startY + row * spacing;
+
                 let slot = this.scene.add.rectangle(x, y, slotSize, slotSize, 0x444444)
                     .setStrokeStyle(2, 0x888888)
                     .setScrollFactor(0)
-                    .setInteractive();
-                
+                    .setInteractive(
+                        new Phaser.Geom.Rectangle(-30, -30, 60, 60),
+                        Phaser.Geom.Rectangle.Contains
+                    );
+
                 slot.slotIndex = this.slots.length;
+
                 this.container.add(slot);
                 this.slots.push(slot);
             }
@@ -79,87 +91,90 @@ export class Inventory {
 
 }
     }
-
-    setupDrag() {
-
+setupDrag() {
+    // Start dragging
     this.scene.input.on('dragstart', (pointer, gameObject) => {
-
-        // prevents dragging if inv is not open
         if (!this.isOpen) return;
 
+        gameObject.dragStartX = pointer.x;
+        gameObject.dragStartY = pointer.y;
+        gameObject.wasDragged = false;
+
+        
         this.scene.children.bringToTop(gameObject);
     });
 
+    
     this.scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
-
-        
         if (!this.isOpen) return;
+
+        if (Math.abs(pointer.x - gameObject.dragStartX) > 2 ||
+            Math.abs(pointer.y - gameObject.dragStartY) > 2) {
+            gameObject.wasDragged = true;
+        }
 
         gameObject.x = dragX;
         gameObject.y = dragY;
     });
 
+    
     this.scene.input.on('dragend', (pointer, gameObject) => {
-    if (!this.isOpen) return;
+        if (!this.isOpen) return;
 
-    let placed = false;
+        const dropX = pointer.x;
+        const dropY = pointer.y;
+        let placed = false;
 
-    // Uses screen instead of world coordinates, saved me a lot of hassle
-    const dropX = pointer.x;
-    const dropY = pointer.y;
+        
+        for (let i = 0; i < this.slots.length; i++) {
+            const slot = this.slots[i];
+            const bounds = slot.getBounds();
 
-    // Handle inventory slots
-    this.slots.forEach((slot, index) => {
-        if (placed) return;
+            if (Phaser.Geom.Rectangle.Contains(bounds, dropX, dropY)) {
 
-        const bounds = slot.getBounds(); 
-        if (Phaser.Geom.Rectangle.Contains(bounds, dropX, dropY)) {
+               
+                if (gameObject.parentContainer) gameObject.parentContainer.remove(gameObject);
 
-            
-            this.container.add(gameObject);
-            gameObject.x = slot.x;
-            gameObject.y = slot.y;
+              
+                this.container.add(gameObject);
+                gameObject.x = slot.x;
+                gameObject.y = slot.y;
 
-            
-            this.items[index] = {
-                type: gameObject.texture.key,
-                sprite: gameObject
-            };
+                gameObject.setDisplaySize(21, 21);
+                gameObject.setInteractive(new Phaser.Geom.Rectangle(-30, -30, 60, 60), Phaser.Geom.Rectangle.Contains);
+                this.scene.input.setDraggable(gameObject);
 
-            
-            if (gameObject.source === 'hotbar') {
-                this.scene.hotbar.tools[gameObject.slotIndex] = null;
+                
+                this.items[i] = { type: gameObject.texture.key, sprite: gameObject };
+
+                
+                if (gameObject.source === 'hotbar') {
+                    this.scene.hotbar.tools[gameObject.slotIndex] = null;
+                }
+
+                gameObject.source = 'inventory';
+                gameObject.slotIndex = i;
+
+                placed = true;
+                break;
             }
-
-           
-            gameObject.source = 'inventory';
-            gameObject.slotIndex = index;
-
-            placed = true;
         }
-    });
-        
 
-        
+       
         if (!placed && this.scene.hotbar) {
-            placed = this.scene.hotbar.tryPlaceItem(
-                gameObject,
-                dropX,
-                dropY,
-                this   
-            );
-        }m
+            placed = this.scene.hotbar.tryPlaceItem(gameObject, dropX, dropY, this);
+        }
 
-        
+       
         if (!placed) {
+            let slot;
             if (gameObject.source === 'hotbar') {
-                const slot = this.scene.hotbar.slots[gameObject.slotIndex];
-                gameObject.x = slot.x;
-                gameObject.y = slot.y;
+                slot = this.scene.hotbar.slots[gameObject.slotIndex];
+            } else if (gameObject.source === 'inventory') {
+                slot = this.slots[gameObject.slotIndex];
             }
 
-            if (gameObject.source === 'inventory') {
-                const slot = this.slots[gameObject.slotIndex];
+            if (slot) {
                 gameObject.x = slot.x;
                 gameObject.y = slot.y;
             }
@@ -167,11 +182,12 @@ export class Inventory {
     });
 }
 
-    addItem(item, slot) {
-        this.items[slot] = item;
-    }
 
-    removeItem(slot) {
-        this.items[slot] = null;
-    }
+addItem(item, slot) {
+    this.items[slot] = item;
 }
+
+removeItem(slot) {
+    this.items[slot] = null;
+}
+} 

@@ -18,7 +18,7 @@ export class Hotbar {
 
         // intial tools/sprites
         this.addTool('Hoe', 0);
-        this.addTool('WateringCan', 1, 15, 4);
+        this.addTool('WateringCan', 1 );
         
      
 
@@ -37,15 +37,22 @@ export class Hotbar {
         const slotCount = 10;
 
         for (let i = 0; i < slotCount; i++) {
-            let x = 190 + i * 28;
+            let x = 170 + i * 40;
             let y = 330;
 
             // Slot rectangle
-            let slot = this.scene.add.rectangle(x, y, 24, 24, 0x444444)
+            let slot = this.scene.add.rectangle(x, y, 32, 32, 0x444444)
                 .setStrokeStyle(2, 0xffffff)
-                .setScrollFactor(0);
+                .setScrollFactor(0)
+                .setInteractive({ useHandCursor: true });
+
             this.container.add(slot);
             this.slots.push(slot);
+
+
+            slot.on('pointerdown', () => {
+                this.selectSlot(i);
+            });
 
             
             let label = i === 9 ? '0' : (i + 1).toString();
@@ -73,7 +80,16 @@ export class Hotbar {
         let toolImage = this.scene.add.image(slot.x + offsetX, slot.y + offsetY, toolKey)
             .setDisplaySize(size, size)
             .setScrollFactor(0)
-            .setInteractive({ draggable: true });
+
+            
+            .setInteractive(
+                new Phaser.Geom.Rectangle(-20, -20, 40, 40),
+                Phaser.Geom.Rectangle.Contains
+            );
+            // Can now click on the hotbar instead of behind it
+            toolImage.on('pointerdown', () => {
+                this.selectSlot(slotIndex);
+            });
 
         this.scene.input.setDraggable(toolImage);
         toolImage.slotIndex = slotIndex;
@@ -113,9 +129,27 @@ export class Hotbar {
 
             
             this.container.add(gameObject);
+
             gameObject.x = slot.x;
             gameObject.y = slot.y;
 
+            // Resize to hotbar size
+            gameObject.setDisplaySize(20, 20);
+
+           
+            gameObject.setInteractive(
+                new Phaser.Geom.Rectangle(-20, -20, 40, 40),
+                Phaser.Geom.Rectangle.Contains
+            );
+
+           
+            this.scene.input.setDraggable(gameObject);
+
+            
+            gameObject.removeAllListeners('pointerdown'); 
+            gameObject.on('pointerdown', () => {
+                this.selectSlot(index);
+            });
          
             this.tools[index] = {
                 type: gameObject.texture.key,

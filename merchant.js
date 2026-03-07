@@ -40,16 +40,29 @@ export class Merchant {
 
         const controlsY = this.panel.y + this.panel.height / 2 - 30;
 
-        // Mode indicator
+        
         this.modeIndicator = this.scene.add.text(320, controlsY - 24, 'Mode: BUY', {
-            fontSize: '18px', fontStyle: 'bold', color: '#00ff00'
+            fontSize: '20px', fontStyle: 'bold', color: '#00ff00'
         }).setOrigin(0.5);
         this.container.add(this.modeIndicator);
 
-        // Should I just remove this? Thought it might help incase someone forgot they can just click buy to toggle between them
+        
+        
+        this.modeButtonBG = this.scene.add.rectangle(320, controlsY, 160, 32, 0x000000, 0)
+            .setInteractive({ useHandCursor: true });
+
+       
         this.modeButton = this.scene.add.text(320, controlsY, '[Toggle Buy/Sell]', {
-            fontSize: '14px', color: '#00ffff'
-        }).setInteractive().setOrigin(0.5).on('pointerdown', () => this.toggleMode());
+            fontSize: '16px',
+            color: '#00ffff'
+        }).setOrigin(0.5);
+
+        
+        this.modeButtonBG.on('pointerdown', () => this.toggleMode());
+
+        
+
+        this.container.add(this.modeButtonBG);
         this.container.add(this.modeButton);
 
         // prev or next butttons
@@ -139,7 +152,7 @@ export class Merchant {
         const startY = 120;
         const slotSpacingX = 70;
         const slotSpacingY = 70;
-        const slotSize = 50; 
+        const slotSize = 55; 
 
         pageItems.forEach((item, i) => {
             const row = Math.floor(i / 5);
@@ -158,7 +171,7 @@ export class Merchant {
                 .setDisplaySize(item.displaySize, item.displaySize);
             this.container.add(sprite);
 
-            const priceText = this.scene.add.text(x, y + 25, `💰${item.price}`, {
+            const priceText = this.scene.add.text(x, y + 28, `💰${item.price}`, {
                 fontSize: '14px', color: '#FFD700', fontStyle: 'bold'
             }).setOrigin(0.5, 0);
             this.container.add(priceText);
@@ -173,50 +186,67 @@ export class Merchant {
     }
 
     buyItem(item) {
-        const economy = this.scene.economy;
-        const inventory = this.scene.inventory;
-        if (!economy || !inventory) return;
-        if (!economy.spendGold(item.price)) return;
+    const economy = this.scene.economy;
+    const inventory = this.scene.inventory;
+    if (!economy || !inventory) return;
+    if (!economy.spendGold(item.price)) return;
 
-        const emptyIndex = inventory.items.findIndex(i => !i);
-        if (emptyIndex === -1) return;
+    const emptyIndex = inventory.items.findIndex(i => !i);
+    if (emptyIndex === -1) return;
 
-        const slot = inventory.slots[emptyIndex];
+    const slot = inventory.slots[emptyIndex];
 
-        // Sprite always 21x21, so it's not oversized when moved to the hotbar
-        const itemSprite = this.scene.add.image(slot.x, slot.y, item.key)
-            .setDisplaySize(21, 21)
-            .setInteractive({ draggable: true });
+    
+    const itemSprite = this.scene.add.image(slot.x, slot.y, item.key)
+    .setDisplaySize(21, 21)
+    .setInteractive(
+        new Phaser.Geom.Rectangle(-21, -21, 60, 60), 
+        Phaser.Geom.Rectangle.Contains
+    );
 
-        itemSprite.source = 'inventory';
-        itemSprite.slotIndex = emptyIndex;
+    
+    this.scene.input.setDraggable(itemSprite);
 
-        inventory.container.add(itemSprite);
+    
+    itemSprite.source = 'inventory';
+    itemSprite.slotIndex = emptyIndex;
 
-        inventory.items[emptyIndex] = {
-            type: item.key,
-            sprite: itemSprite,
-            price: item.price,
-            displaySize: 21
-        };
+    
+    inventory.container.add(itemSprite);
+    this.scene.children.bringToTop(itemSprite); 
+
+    inventory.items[emptyIndex] = {
+        type: item.key,
+        sprite: itemSprite,
+        price: item.price,
+        displaySize: 21
+    };
 
         
-        this.scene.input.setDraggable(itemSprite);
-        this.scene.input.on('dragend', (pointer, gameObject) => {
-            if (!gameObject || gameObject.source !== 'inventory') return;
 
-            const placed = this.scene.hotbar.tryPlaceItem(gameObject, pointer.worldX, pointer.worldY, inventory);
+    
 
-            if (!placed) {
-                const origSlot = inventory.slots[gameObject.slotIndex];
-                gameObject.x = origSlot.x;
-                gameObject.y = origSlot.y;
-            }
-        });
+    itemSprite.source = 'inventory';
+    itemSprite.slotIndex = emptyIndex;
 
-        this.refreshItems();
-    }
+    
+    inventory.container.add(itemSprite);
+    this.scene.children.bringToTop(itemSprite);
 
+   
+    inventory.items[emptyIndex] = {
+        type: item.key,
+        sprite: itemSprite,
+        price: item.price,
+        displaySize: 21
+    };
+
+    
+    this.scene.input.setDraggable(itemSprite);
+
+    
+    this.refreshItems();
+}
     // Will add to this later, the price to which an item is sold should be able to be influnced by various factors (crop quality, demand etc.)
     sellItem(item) {
         const economy = this.scene.economy;
