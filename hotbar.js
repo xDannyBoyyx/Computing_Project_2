@@ -134,30 +134,69 @@ export class Hotbar {
 
             const other = targetTool.sprite;
 
-          
-            this.tools[index] = { type: gameObject.texture.key, sprite: gameObject };
-            this.tools[oldIndex] = targetTool;
+            // inv/hotbar swap
+            if (gameObject.source === 'inventory') {
 
-            
-            gameObject.slotIndex = index;
-            other.slotIndex = oldIndex;
+                // move hotbar item to inventory
+                if (other.parentContainer) other.parentContainer.remove(other);
+                inventoryRef.container.add(other);
 
-            // animation
-            this.scene.tweens.add({
-                targets: gameObject,
-                x: this.slots[index].x,
-                y: this.slots[index].y,
-                duration: 120
-            });
+                const invSlot = inventoryRef.slots[oldIndex];
 
-            this.scene.tweens.add({
-                targets: other,
-                x: this.slots[oldIndex].x,
-                y: this.slots[oldIndex].y,
-                duration: 120
-            });
+                this.scene.tweens.add({
+                    targets: other,
+                    x: invSlot.x,
+                    y: invSlot.y,
+                    duration: 120
+                });
 
-        } 
+                inventoryRef.items[oldIndex] = {
+                    type: other.texture.key,
+                    sprite: other
+                };
+
+                other.source = 'inventory';
+                other.slotIndex = oldIndex;
+
+                
+                this.tools[index] = { type: gameObject.texture.key, sprite: gameObject };
+
+                gameObject.slotIndex = index;
+
+                this.scene.tweens.add({
+                    targets: gameObject,
+                    x: this.slots[index].x,
+                    y: this.slots[index].y,
+                    duration: 120
+                });
+
+            }
+
+            //  hotbar/hotbar swap
+            else {
+
+                this.tools[index] = { type: gameObject.texture.key, sprite: gameObject };
+                this.tools[oldIndex] = targetTool;
+
+                gameObject.slotIndex = index;
+                other.slotIndex = oldIndex;
+
+                this.scene.tweens.add({
+                    targets: gameObject,
+                    x: this.slots[index].x,
+                    y: this.slots[index].y,
+                    duration: 120
+                });
+
+                this.scene.tweens.add({
+                    targets: other,
+                    x: this.slots[oldIndex].x,
+                    y: this.slots[oldIndex].y,
+                    duration: 120
+                });
+
+            }
+        }
         
         else {
 
