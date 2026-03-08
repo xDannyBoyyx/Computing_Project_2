@@ -50,18 +50,24 @@ export class Inventory {
                 let x = startX + col * spacing;
                 let y = startY + row * spacing;
 
+                // visual slot
                 let slot = this.scene.add.rectangle(x, y, slotSize, slotSize, 0x444444)
                     .setStrokeStyle(2, 0x888888)
-                    .setScrollFactor(0)
-                    .setInteractive(
-                        new Phaser.Geom.Rectangle(-30, -30, 60, 60),
-                        Phaser.Geom.Rectangle.Contains
-                    );
+                    .setScrollFactor(0);
 
-                slot.slotIndex = this.slots.length;
+                // invisible hitbox
+                let hitbox = this.scene.add.rectangle(x, y, 60, 60, 0x000000, 0)
+                    .setScrollFactor(0)
+                    .setInteractive({ useHandCursor: true });
+
+                hitbox.slotIndex = this.slots.length;
 
                 this.container.add(slot);
-                this.slots.push(slot);
+                this.container.add(hitbox);
+
+                this.slots.push(hitbox);
+
+                
             }
         }
         
@@ -135,6 +141,11 @@ setupDrag() {
                
                 if (gameObject.parentContainer) gameObject.parentContainer.remove(gameObject);
 
+         
+                if (gameObject.source === 'inventory') {
+                    this.items[gameObject.slotIndex] = null;
+                }
+
               
                 this.container.add(gameObject);
                 gameObject.x = slot.x;
@@ -145,6 +156,12 @@ setupDrag() {
                 this.scene.input.setDraggable(gameObject);
 
                 
+                // remove existing item in slot
+                if (this.items[i]?.sprite && this.items[i].sprite !== gameObject) {
+                    this.items[i].sprite.destroy();
+                }
+
+                // place new item
                 this.items[i] = { type: gameObject.texture.key, sprite: gameObject };
 
                 

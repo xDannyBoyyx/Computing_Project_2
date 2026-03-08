@@ -49,7 +49,8 @@ class GameScene extends Phaser.Scene {
    
     // this.map = map;
     this.farmManager = new FarmManager(this, map);
-    this.economy = new EconomyManager(this, 100); 
+    // the number argument = gold, so change it to whatever you want 
+    this.economy = new EconomyManager(this, 10000); 
     this.merchant = new Merchant(this);
      
     
