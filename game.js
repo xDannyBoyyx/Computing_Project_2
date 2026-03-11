@@ -6,7 +6,6 @@ import { Inventory } from './inventory.js';
 import { MainMenu } from './mainMenu.js';
 import { Merchant } from './merchant.js';
 
-
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });

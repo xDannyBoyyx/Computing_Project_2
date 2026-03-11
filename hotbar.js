@@ -1,6 +1,5 @@
 // Refactored completely as I needed to make the hotbar dynamic, while getting it to work with the inventory and other classes
 
-
 export class Hotbar {
     constructor(scene) {
         this.scene = scene;
@@ -20,19 +19,17 @@ export class Hotbar {
         this.addTool('Hoe', 0);
         this.addTool('WateringCan', 1 );
         
-     
-
         // These don't do anything yet, just there to sell and purchase tools for the merchant class for now
+
+        // do we technically need these for now or should at least be purchased and used later on?
+        // Maybe its best if the player just starts with the hoe and watering can? -D
         this.addTool('Axe', 2);      
         this.addTool('Hammer', 3);   
         this.addTool('Pickaxe', 4);  
         this.addTool('Scythe', 5);   
-        this.addTool('Shovel', 6);
-        
-        
+        this.addTool('Shovel', 6);   
     }
     
-  
     createSlots() {
         const slotCount = 10;
 
@@ -49,17 +46,14 @@ export class Hotbar {
             this.container.add(slot);
             this.slots.push(slot);
 
-
             slot.on('pointerdown', () => {
                 this.selectSlot(i);
             });
-
             
             let label = i === 9 ? '0' : (i + 1).toString();
             let text = this.scene.add.text(x - 10, y - 10, label, { fontSize: '10px' })
                 .setScrollFactor(0);
             this.container.add(text);
-
             
             this.tools.push(null);
         }
@@ -81,7 +75,6 @@ export class Hotbar {
             .setDisplaySize(size, size)
             .setScrollFactor(0)
 
-            
             .setInteractive(
                 new Phaser.Geom.Rectangle(-20, -20, 40, 40),
                 Phaser.Geom.Rectangle.Contains
@@ -106,127 +99,120 @@ export class Hotbar {
         this.slots[this.selectedSlot].setStrokeStyle(3, 0xffff00);
     }
 
-  tryPlaceItem(gameObject, dropX, dropY, inventoryRef) {
-    let placed = false;
+    tryPlaceItem(gameObject, dropX, dropY, inventoryRef) {
+        let placed = false;
 
-    this.slots.forEach((slot, index) => {
-        if (placed) return;
+        this.slots.forEach((slot, index) => {
+            if (placed) return;
 
-        const bounds = slot.getBounds();
-        if (!Phaser.Geom.Rectangle.Contains(bounds, dropX, dropY)) return;
+            const bounds = slot.getBounds();
+            if (!Phaser.Geom.Rectangle.Contains(bounds, dropX, dropY)) return;
 
-        const oldIndex = gameObject.slotIndex;
-        const targetTool = this.tools[index];
-
-        
-        if (gameObject.source === 'inventory') {
-            inventoryRef.items[oldIndex] = null;
-        } else if (gameObject.source === 'hotbar') {
-            this.tools[oldIndex] = null;
-        }
-
-       
-        if (gameObject.parentContainer) gameObject.parentContainer.remove(gameObject);
-        this.container.add(gameObject);
-
-        // Swap
-        if (targetTool && targetTool.sprite !== gameObject) {
-
-            const other = targetTool.sprite;
-
-            // inv/hotbar swap
+            const oldIndex = gameObject.slotIndex;
+            const targetTool = this.tools[index];
+            
             if (gameObject.source === 'inventory') {
-
-                // move hotbar item to inventory
-                if (other.parentContainer) other.parentContainer.remove(other);
-                inventoryRef.container.add(other);
-
-                const invSlot = inventoryRef.slots[oldIndex];
-
-                this.scene.tweens.add({
-                    targets: other,
-                    x: invSlot.x,
-                    y: invSlot.y,
-                    duration: 120
-                });
-
-                inventoryRef.items[oldIndex] = {
-                    type: other.texture.key,
-                    sprite: other
-                };
-
-                other.source = 'inventory';
-                other.slotIndex = oldIndex;
-
-                
-                this.tools[index] = { type: gameObject.texture.key, sprite: gameObject };
-
-                gameObject.slotIndex = index;
-
-                this.scene.tweens.add({
-                    targets: gameObject,
-                    x: this.slots[index].x,
-                    y: this.slots[index].y,
-                    duration: 120
-                });
-
+                inventoryRef.items[oldIndex] = null;
+            } else if (gameObject.source === 'hotbar') {
+                this.tools[oldIndex] = null;
             }
 
-            //  hotbar/hotbar swap
+            if (gameObject.parentContainer) gameObject.parentContainer.remove(gameObject);
+            this.container.add(gameObject);
+
+            // Swap
+            if (targetTool && targetTool.sprite !== gameObject) {
+
+                const other = targetTool.sprite;
+
+                // inv/hotbar swap
+                if (gameObject.source === 'inventory') {
+
+                    // move hotbar item to inventory
+                    if (other.parentContainer) other.parentContainer.remove(other);
+                    inventoryRef.container.add(other);
+
+                    const invSlot = inventoryRef.slots[oldIndex];
+
+                    this.scene.tweens.add({
+                        targets: other,
+                        x: invSlot.x,
+                        y: invSlot.y,
+                        duration: 120
+                    });
+
+                    inventoryRef.items[oldIndex] = {
+                        type: other.texture.key,
+                        sprite: other
+                    };
+
+                    other.source = 'inventory';
+                    other.slotIndex = oldIndex;
+                    
+                    this.tools[index] = { type: gameObject.texture.key, sprite: gameObject };
+
+                    gameObject.slotIndex = index;
+
+                    this.scene.tweens.add({
+                        targets: gameObject,
+                        x: this.slots[index].x,
+                        y: this.slots[index].y,
+                        duration: 120
+                    });
+                }
+
+                //  hotbar/hotbar swap
+                else {
+
+                    this.tools[index] = { type: gameObject.texture.key, sprite: gameObject };
+                    this.tools[oldIndex] = targetTool;
+
+                    gameObject.slotIndex = index;
+                    other.slotIndex = oldIndex;
+
+                    this.scene.tweens.add({
+                        targets: gameObject,
+                        x: this.slots[index].x,
+                        y: this.slots[index].y,
+                        duration: 120
+                    });
+
+                    this.scene.tweens.add({
+                        targets: other,
+                        x: this.slots[oldIndex].x,
+                        y: this.slots[oldIndex].y,
+                        duration: 120
+                    });
+                }
+            }
+            
             else {
-
                 this.tools[index] = { type: gameObject.texture.key, sprite: gameObject };
-                this.tools[oldIndex] = targetTool;
 
                 gameObject.slotIndex = index;
-                other.slotIndex = oldIndex;
 
-                this.scene.tweens.add({
-                    targets: gameObject,
-                    x: this.slots[index].x,
-                    y: this.slots[index].y,
-                    duration: 120
-                });
-
-                this.scene.tweens.add({
-                    targets: other,
-                    x: this.slots[oldIndex].x,
-                    y: this.slots[oldIndex].y,
-                    duration: 120
-                });
-
+                gameObject.x = slot.x;
+                gameObject.y = slot.y;
             }
-        }
-        
-        else {
 
-            this.tools[index] = { type: gameObject.texture.key, sprite: gameObject };
+            gameObject.source = 'hotbar';
 
-            gameObject.slotIndex = index;
+            gameObject.setDisplaySize(20,20)
+            .setInteractive(
+                new Phaser.Geom.Rectangle(-20,-20,40,40),
+                Phaser.Geom.Rectangle.Contains
+            );
 
-            gameObject.x = slot.x;
-            gameObject.y = slot.y;
-        }
+            this.scene.input.setDraggable(gameObject);
 
-        
-        gameObject.source = 'hotbar';
+            gameObject.removeAllListeners('pointerdown');
+            gameObject.on('pointerdown', () => this.selectSlot(index));
 
-        gameObject.setDisplaySize(20,20)
-        .setInteractive(
-            new Phaser.Geom.Rectangle(-20,-20,40,40),
-            Phaser.Geom.Rectangle.Contains
-        );
-
-        this.scene.input.setDraggable(gameObject);
-
-        gameObject.removeAllListeners('pointerdown');
-        gameObject.on('pointerdown', () => this.selectSlot(index));
-
-        placed = true;
-    });
+            placed = true;
+        });
 
     return placed;
-}
+    }
 
     setupKeys() {
         const keys = ['ONE','TWO','THREE','FOUR','FIVE','SIX','SEVEN','EIGHT','NINE','ZERO'];

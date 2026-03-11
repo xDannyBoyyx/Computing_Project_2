@@ -1,6 +1,7 @@
 // This is where all plants including crops will work
 
-// Will finish it hopefully when i get back
+import {plantData} from './plantsData.js';
+
 export class Plant {
     constructor(scene, tileX, tileY, type){
         this.scene = scene;
@@ -11,38 +12,49 @@ export class Plant {
         this.worldX = tileX * 16; // world position x
         this.worldY = tileY * 16; // world position y
 
-        if (type == "plant"){
-            this.startFrame = 0; // ID on the spritesheet (using tiled)
-            this.maxStages = 3;
+        // if (type == "carrot"){
+        //     this.startFrame = 18; // ID on the spritesheet (using tiled)
+        //     this.maxStages = 3;
 
-            this.sprite = scene.add.sprite(
-                this.worldX + 8, // center x wise
-                this.worldY + 16, // center y wise
-                "smallPlant",
-                this.startFrame   // starting frame / plant stage
-            );
-        }
+        //     this.sprite = scene.add.sprite(
+        //         this.worldX + 8, // center x wise
+        //         this.worldY + 16, // center y wise
+        //         "smallPlant",
+        //         this.startFrame   // starting frame / plant stage
+        //     );
+        // }
 
-        this.sprite.setOrigin(0.5, 1); // Sets the origin to the bottom-middle of the tile.
-        this.sprite.setDepth(this.sprite.y); // Ensures that the depth of the sprite is where its placed,
-        // wont have an issue if placed behind or in front of another, all of them will be seen.
+        console.log(plantData[this.type]);
 
-        this.startFrame; // What plant it'll be from the spritesheet
+        this.spriteSheet = plantData[this.type].spriteSheet;
+        this.startFrame = plantData[this.type].startFrame; // What plant it'll be from the spritesheet
         this.currentFrame = this.startFrame; // When changing frames to the next it'll start from the initial point
 
         this.currentStage = 1; // The growth stage
-        this.maxStages; // Depending on the plants
+        this.maxStages = plantData[this.type].maxStage; // Depending on the plants
+        console.log(this.maxStages);
 
         this.growthTimer = 0; // Timer that it'll use to grow real time
+        this.nextStageTimer = plantData[this.type].nextStageTimer;
         this.fullyGrown = false; // Only started growing so no
 
-        // this.growthSpeed = 5000; // 5 seconds for an example
-        // this.growthModifier = 1; // how it affects the growth speed
+        this.growthModifier = 1; // how it affects the growth speed
 
         this.harvestable = false;
 
         // example if (growthTimer >= growthSpeed * growthModifer)
         // modifier will change depending on the weather for example
+
+        this.sprite = scene.add.sprite(
+            this.worldX + 8, // center x wise
+            this.worldY + 16, // center y wise
+            this.spriteSheet,
+            this.startFrame   // starting frame / plant stage
+        );
+
+        this.sprite.setOrigin(0.5, 1); // Sets the origin to the bottom-middle of the tile.
+        this.sprite.setDepth(this.sprite.y); // Ensures that the depth of the sprite is where its placed,
+        // wont have an issue if placed behind or in front of another, all of them will be seen.
     }
 
     update(time, delta){
@@ -50,7 +62,7 @@ export class Plant {
         this.growthTimer += delta;
 
         if (this.fullyGrown == false){
-            if (this.growthTimer >= 3000){ // 3 seconds for now but in real game might be maybe even minutes
+            if (this.growthTimer >= this.nextStageTimer){ // seconds for now but in real game might be maybe even minutes
                 this.grow();
                 this.growthTimer = 0;
             }
@@ -61,17 +73,16 @@ export class Plant {
         this.currentStage += 1;
         this.currentFrame += 1;
 
-        this.sprite.setTexture("smallPlant", this.currentFrame);
-        // console.log("Growing");
+        this.sprite.setTexture(plantData[this.type].spriteSheet, this.currentFrame);
 
         if (this.currentStage >= this.maxStages){
             // stop update or grow so its not contantly running in the background as the plant is fully grown? 
             this.fullyGrown = true;
             this.harvestable = true;
-            // console.log("fully grown");
         }
     }
 
+    // might use a data table similar to plantData.js for the different factors like humidity, temperature, wind, etc.
     reactToWeather(weather){
 
         // could slow down growthtimer or some other feature for example?

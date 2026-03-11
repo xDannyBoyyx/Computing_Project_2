@@ -50,11 +50,11 @@ export class FarmManager {
             this.handleFarmAction(tile.x, tile.y, "primary");
         }
 
-        // For each plant inside the plant array, update them to ensure they can grow
-        // Will be updated to ensure that they check certain parameters like it being watered
-        // or certain weather conditions for example -D
+        // For each plant inside the plant array, update them to ensure they can grow after being watered
         for (var p of this.plantsArr){
-            p.update(time,delta);
+            if (this.getTile(p.tileX, p.tileY).watered){
+                p.update(time,delta);
+            }
         }
     }
 
@@ -80,8 +80,7 @@ export class FarmManager {
                 this.till(x, y);
             } 
             else if (tile.tilled && !tile.plant && !toolType) { 
-                // eventually check for seeds instead of empty handed
-                this.plant(x, y, "plant");
+                this.plant(x, y, "radish"); // will check pouch type soon instead 
             }
             else if (toolType === 'WateringCan' && tile.tilled) {
                 this.water(x, y);
@@ -186,6 +185,7 @@ export class FarmManager {
         if (tile.tilled && !tile.plant) {
             // Create a crop object to track its growth
             tile.plant = new Plant(this.scene, x, y, plantType);
+            console.log(tile.plant.tileX);
 
             this.plantsArr.push(tile.plant); // To access plants outside the function
 
