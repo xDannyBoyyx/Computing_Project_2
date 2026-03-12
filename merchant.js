@@ -25,7 +25,7 @@ export class Merchant {
 
         this.currentMode = 'buy';
         this.itemSlots = [];
-        this.itemsPerPage = 8; // 2 rows × 5 columns
+        this.itemsPerPage = 10; // 2 rows × 5 columns
         this.currentPage = 0;
 
         this.createUI();
@@ -269,6 +269,7 @@ export class Merchant {
     }
 
 }
+
 
 
 
