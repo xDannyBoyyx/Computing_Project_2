@@ -2,7 +2,9 @@ import { Plant } from "./plants.js";
 
 const pouchToPlant = {
     'wheatPouch': 'wheat',
-    'carrotPouch': 'carrot'
+    'carrotPouch': 'carrot',
+    'raddishPouch': 'raddish'
+    
 };
 
 export class FarmManager {
@@ -201,6 +203,7 @@ export class FarmManager {
         }
     }
 }
+
 
 
 
