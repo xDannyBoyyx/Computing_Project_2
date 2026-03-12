@@ -25,7 +25,7 @@ export const plantData = {
         sellValue: 6,
         harvestMin: 2,
         harvestMax: 5,
-        spriteSheet: "largePlant", 
-        startFrame: 6 //TO BE CHANGED TO CORRECT FRAME NUMBER
+        spriteSheet: "mediumPlant", 
+        startFrame: 0 //TO BE CHANGED TO CORRECT FRAME NUMBER
     }
 }
