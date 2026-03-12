@@ -10,7 +10,7 @@ export const plantData = {
         spriteSheet: "smallPlant",
         startFrame: 18
     },
-    "radish": {
+    "raddish": {
         nextStageTimer: 4000,
         maxStage: 3,
         sellValue: 7,
