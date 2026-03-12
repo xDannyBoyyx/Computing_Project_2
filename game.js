@@ -25,6 +25,7 @@ class GameScene extends Phaser.Scene {
     this.load.image('Scythe', 'assets/Scythe.png'); 
     this.load.image('Shovel', 'assets/Shovel.png');
     this.load.image('wheatPouch', 'assets/pouches/wheatPouch.png');
+    this.load.image('carrotPouch', 'assets/pouches/carrotPouch.png');
     
     this.load.spritesheet('player', 'assets/maleSS.png', {
       frameWidth: 64,
