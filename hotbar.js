@@ -28,7 +28,7 @@ export class Hotbar {
         this.addTool('Pickaxe', 4);  
         this.addTool('Scythe', 5);   
         this.addTool('Shovel', 6);
-        this.addTool('wheatPouch', 7);
+        // this.addTool('wheatPouch', 7); //uncomment if you want to have the pouch in ur hotbar for testing
     }
     
     createSlots() {
