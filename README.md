@@ -19,20 +19,6 @@ TO DO:
 
 - ADD NPC WHICH SELL CROPS AND YOU CAN BUY FROM HIM
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-Bugs/Fixes TO DO:
-1. You can drag an item on a slot which has a different item already.
-2. You can only sell items which are in your Inventory, you should be able to sell from hotbar as well.
-3. Dragging and dropping items in inventory or hotbar is a bit delayed and sometimes doesn't work.
-4. Selling items only gives you 5 gold instead of the 10 promised.
-5. Sometimes buying an item you can't move it from your inventory and it's just stuck.
-6. Sometimes you can't even buy an item from the shop even though you have enough Gold.
-7. Sometimes items duplicate and sell for different prices from the merchant.
-8. After opening up the Inventory you can drag an item anywhere on the screen.
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 ~~- ADD ABILITY TO FARM THE GROUND BY LEFT/RIGHT-CLICKING OR PRESSING A BUTTON~~
 
 ~~- ADD ABILITY TO PLANT ON THE GROUND WHERE A HOE HAS BEEN USED~~
@@ -44,6 +30,10 @@ Bugs/Fixes TO DO:
 ~~- ADD MUSIC~~
 
 - ADD A SETTINGS SCREEN TO CHANGE VOLUME ETC
+
+- ADD ABILITY TO HARVEST CROPS
+
+- WHEN CROPS ARE HARVESTED THEY SHOULD EITHER GO STRAIGHT TO THE INVENTORY/HOTBAR OR DROP ON THE GROUND
   
 - MISSCALANEOUS
 
