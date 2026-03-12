@@ -9,6 +9,7 @@ export class MainMenu extends Phaser.Scene {
     }
     
     create() {
+        this.cameras.main.setBackgroundColor('#fdf5ea');
         this.add.image(320, 180, 'menuScreen');
         
         // START button (x, y, width, height)
