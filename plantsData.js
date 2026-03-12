@@ -26,6 +26,15 @@ export const plantData = {
         harvestMin: 2,
         harvestMax: 5,
         spriteSheet: "mediumPlant", 
-        startFrame: 0 //TO BE CHANGED TO CORRECT FRAME NUMBER
+        startFrame: 0
+    },
+    "cabbage": {
+        nextStageTimer: 3750,
+        maxStage: 3,
+        sellValue: 6,
+        harvestMin: 2,
+        harvestMax: 4,
+        spriteSheet: "mediumPlant", 
+        startFrame: 20 
     }
 }
