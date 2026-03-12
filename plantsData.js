@@ -26,6 +26,6 @@ export const plantData = {
         harvestMin: 2,
         harvestMax: 5,
         spriteSheet: "largePlant", 
-        startFrame: 3 //TO BE CHANGED TO CORRECT FRAME NUMBER
+        startFrame: 6 //TO BE CHANGED TO CORRECT FRAME NUMBER
     }
 }
