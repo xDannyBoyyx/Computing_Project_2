@@ -1,5 +1,9 @@
 import { Plant } from "./plants.js";
 
+const pouchToPlant = {
+    'wheatPouch': 'wheat'
+};
+
 export class FarmManager {
     constructor(scene, map) {
         this.scene = scene;   
@@ -78,9 +82,12 @@ export class FarmManager {
 
             if (toolType === 'Hoe' && !tile.tilled) {
                 this.till(x, y);
-            } 
-            else if (tile.tilled && !tile.plant && !toolType) { 
-                this.plant(x, y, "radish"); // will check pouch type soon instead 
+            }
+                //check if its a pouch
+            else if (pouchToPlant[toolType] && tile.tilled && !tile.plant) {
+                const plantType = pouchToPlant[toolType]; // Get wheat from wheatPouch
+                this.plant(x, y, plantType);
+                console.log(`Planted ${plantType} from ${toolType}`);
             }
             else if (toolType === 'WateringCan' && tile.tilled) {
                 this.water(x, y);
@@ -193,4 +200,5 @@ export class FarmManager {
         }
     }
 }
+
 
