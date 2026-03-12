@@ -4,7 +4,15 @@
 export class WorldManager {
     constructor(scene){
         this.scene = scene;
-        this.time = new Date().toLocaleTimeString();
+
+        // Returns as a string and makes it more difficult to split into hours, minutes, and seconds.
+        // this.time = new Date().toLocaleTimeString();
+
+        this.time = new Date();
+        this.hour = this.time.getHours();
+        this.min = this.time.getMinutes();
+        this.sec = this.time.getSeconds();
+
         this.updateClock = this.updateClock.bind(this); // had to lock this = WorldManager rather than this = window because of setInterval
     }
 
@@ -13,7 +21,7 @@ export class WorldManager {
         // displays top left
         this.timeText = this.scene.add.text(
             100, 20,                  
-            this.time,      
+            `${this.hour}:${this.min}:${this.sec}`,      
             { fontSize: '18px', color: '#09006f', fontStyle: 'bold' }
         ).setOrigin(1, 0);
 
@@ -27,7 +35,13 @@ export class WorldManager {
     }
 
     updateClock(){
-         this.time = new Date().toLocaleTimeString();
-         this.timeText.setText(this.time);
+        // ensuring its up to date
+        this.time = new Date();
+        this.hour = this.time.getHours();
+        this.min = this.time.getMinutes();
+        this.sec = this.time.getSeconds();
+        
+        // updating the text in UI to be real time
+        this.timeText.setText(`${this.hour}:${this.min}:${this.sec}`);
     }
 }
