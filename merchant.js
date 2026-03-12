@@ -17,6 +17,7 @@ export class Merchant {
             { key: 'Hammer', price: 30, displaySize: 21 },
             { key: 'Scythe', price: 60, displaySize: 21 },
             { key: 'Shovel', price: 25, displaySize: 21 },
+            { key: 'wheatPouch', price: 30, displaySize: 21 },
         ];
 
         this.currentMode = 'buy';
@@ -263,4 +264,5 @@ export class Merchant {
     update(time, delta) {
         if (!this.isOpen) return;
     }
+
 }
