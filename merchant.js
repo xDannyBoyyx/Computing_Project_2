@@ -29,35 +29,27 @@ export class Merchant {
     }
 
     createUI() {
-        
         this.panel = this.scene.add.rectangle(320, 180, 440, 360, 0x2a2a2a)
             .setStrokeStyle(3, 0xffffff);
         this.container.add(this.panel);
-
         
         this.title = this.scene.add.text(320, 80, 'MERCHANT', { fontSize: '20px', color: '#ffffff' }).setOrigin(0.5);
         this.container.add(this.title);
 
         const controlsY = this.panel.y + this.panel.height / 2 - 30;
 
-        
-        
         this.modeIndicator = this.scene.add.text(320, controlsY - 22, 'BUY', {
             fontSize: '26px',
             fontStyle: 'bold',
             color: '#00ff00'
         }).setOrigin(0.5);
         this.container.add(this.modeIndicator);
-                
         
         this.modeButtonBG = this.scene.add.rectangle(320, controlsY, 240, 40, 0x000000, 0)
         .setInteractive({ useHandCursor: true })
         .on('pointerdown', () => this.toggleMode());
 
         this.container.add(this.modeButtonBG);
-
-        
-
 
         // prev or next butttons
         const prevHitbox = this.scene.add.rectangle(200, controlsY, 110, 40, 0x000000, 0)
@@ -84,7 +76,6 @@ export class Merchant {
         this.container.add(nextHitbox);
         this.container.add(this.nextButton);
 
-        
         this.closeHint = this.scene.add.text(320, controlsY + 22, 'Press M to close', { fontSize: '14px', color: '#aaaaaa' })
             .setOrigin(0.5);
         this.container.add(this.closeHint);
@@ -131,129 +122,121 @@ export class Merchant {
     getCurrentItems() {
         if (this.currentMode === 'buy') return this.itemsForSale;
 
-      if (this.currentMode === 'sell') {
-    let sellableItems = [];
+        if (this.currentMode === 'sell') {
+            let sellableItems = [];
 
-    // Add inv items
-    if (this.scene.inventory) {
-        sellableItems.push(...this.scene.inventory.items
-            .map((invItem, i) => invItem ? {
-                type: invItem.type,
-                sprite: invItem.sprite,
-                slotIndex: i,
-                source: 'inventory',
-                price: Math.floor(invItem.price / 2) || 10,
-                displaySize: 21
-            } : null)
-            .filter(i => i));
+            // Add inv items
+            if (this.scene.inventory) {
+                sellableItems.push(...this.scene.inventory.items
+                .map((invItem, i) => invItem ? {
+                    type: invItem.type,
+                    sprite: invItem.sprite,
+                    slotIndex: i,
+                    source: 'inventory',
+                    price: Math.floor(invItem.price / 2) || 10,
+                    displaySize: 21
+                } : null)
+                .filter(i => i));
+            }
+
+            // Add hotbar items
+            if (this.scene.hotbar) {
+                this.scene.hotbar.tools.forEach((tool, i) => {
+                    if (!tool) return;
+                    sellableItems.push({
+                        type: tool.type,
+                        sprite: tool.sprite,
+                        slotIndex: i,
+                        source: 'hotbar',
+                        price: Math.floor(this.itemsForSale.find(x => x.key === tool.type)?.price / 2) || 10,
+                        displaySize: 20
+                    });
+                });
+            }
+
+            return sellableItems;
+        }
     }
 
-    // Add hotbar items
-    if (this.scene.hotbar) {
-        this.scene.hotbar.tools.forEach((tool, i) => {
-            if (!tool) return;
-            sellableItems.push({
-                type: tool.type,
-                sprite: tool.sprite,
-                slotIndex: i,
-                source: 'hotbar',
-                price: Math.floor(this.itemsForSale.find(x => x.key === tool.type)?.price / 2) || 10,
-                displaySize: 20
+   refreshItems() {
+        // Destroy previous items
+        this.itemSlots.forEach(slotData => {
+            slotData.slot.destroy();
+            slotData.sprite.destroy();
+            slotData.priceText.destroy();
+        });
+        this.itemSlots = [];
+
+        const items = this.getCurrentItems();
+        const pageItems = items.slice(this.currentPage * this.itemsPerPage, (this.currentPage + 1) * this.itemsPerPage);
+
+        const startX = 180;
+        const startY = 120;
+        const slotSpacingX = 70;
+        const slotSpacingY = 70;
+        const slotSize = 55; 
+
+        pageItems.forEach((item, i) => {
+            const row = Math.floor(i / 5);
+            const col = i % 5;
+            const x = startX + col * slotSpacingX;
+            const y = startY + row * slotSpacingY;
+
+            const slot = this.scene.add.rectangle(x, y, slotSize, slotSize, 0x444444)
+                .setStrokeStyle(2, 0xffffff)
+                .setInteractive();
+            this.container.add(slot);
+
+            const sprite = this.scene.add.image(x, y, item.type || item.key)
+                .setDisplaySize(item.displaySize, item.displaySize);
+            this.container.add(sprite);
+
+            const priceText = this.scene.add.text(x, y + 28, `💰${item.price}`, {
+                fontSize: '14px', color: '#FFD700', fontStyle: 'bold'
+            }).setOrigin(0.5, 0);
+            this.container.add(priceText);
+
+            this.itemSlots.push({ slot, sprite, priceText, item });
+
+            slot.on('pointerdown', () => {
+                if (this.currentMode === 'buy') this.buyItem(item);
+                else this.sellItem(item);
             });
         });
     }
 
-    return sellableItems;
-}
+    buyItem(item) {
+        const economy = this.scene.economy;
+        const inventory = this.scene.inventory;
+        if (!economy || !inventory) return;
+        if (!economy.spendGold(item.price)) return;
+
+        const emptyIndex = inventory.items.findIndex(i => !i);
+        if (emptyIndex === -1) return;
+
+        // reserve slot
+        inventory.items[emptyIndex] = { reserved: true };
+        const slot = inventory.slots[emptyIndex];
+
+        const itemSprite = this.scene.add.image(slot.x, slot.y, item.key)
+            .setDisplaySize(21, 21)
+            .setInteractive(new Phaser.Geom.Rectangle(-21, -21, 60, 60), Phaser.Geom.Rectangle.Contains);
+
+        this.scene.input.setDraggable(itemSprite);
+        itemSprite.source = 'inventory';
+        itemSprite.slotIndex = emptyIndex;
+
+        inventory.container.add(itemSprite);
+        
+
+        inventory.items[emptyIndex] = {
+            type: item.key,
+            sprite: itemSprite,
+            price: item.price,
+            displaySize: 21
+        };
     }
-
-   refreshItems() {
-    // Destroy previous items
-    this.itemSlots.forEach(slotData => {
-        slotData.slot.destroy();
-        slotData.sprite.destroy();
-        slotData.priceText.destroy();
-    });
-    this.itemSlots = [];
-
-    const items = this.getCurrentItems();
-    const pageItems = items.slice(this.currentPage * this.itemsPerPage, (this.currentPage + 1) * this.itemsPerPage);
-
-    const startX = 180;
-    const startY = 120;
-    const slotSpacingX = 70;
-    const slotSpacingY = 70;
-    const slotSize = 55; 
-
-    pageItems.forEach((item, i) => {
-        const row = Math.floor(i / 5);
-        const col = i % 5;
-        const x = startX + col * slotSpacingX;
-        const y = startY + row * slotSpacingY;
-
-        const slot = this.scene.add.rectangle(x, y, slotSize, slotSize, 0x444444)
-            .setStrokeStyle(2, 0xffffff)
-            .setInteractive();
-        this.container.add(slot);
-
-        const sprite = this.scene.add.image(x, y, item.type || item.key)
-            .setDisplaySize(item.displaySize, item.displaySize);
-        this.container.add(sprite);
-
-        const priceText = this.scene.add.text(x, y + 28, `💰${item.price}`, {
-            fontSize: '14px', color: '#FFD700', fontStyle: 'bold'
-        }).setOrigin(0.5, 0);
-        this.container.add(priceText);
-
-        this.itemSlots.push({ slot, sprite, priceText, item });
-
-        slot.on('pointerdown', () => {
-            if (this.currentMode === 'buy') this.buyItem(item);
-            else this.sellItem(item);
-        });
-    });
-
     
-    
-}
- 
-
-   buyItem(item) {
-    const economy = this.scene.economy;
-    const inventory = this.scene.inventory;
-    if (!economy || !inventory) return;
-    if (!economy.spendGold(item.price)) return;
-
-    const emptyIndex = inventory.items.findIndex(i => !i);
-    if (emptyIndex === -1) return;
-
-    // reserve slot
-    inventory.items[emptyIndex] = { reserved: true };
-    const slot = inventory.slots[emptyIndex];
-
-    const itemSprite = this.scene.add.image(slot.x, slot.y, item.key)
-        .setDisplaySize(21, 21)
-        .setInteractive(new Phaser.Geom.Rectangle(-21, -21, 60, 60), Phaser.Geom.Rectangle.Contains);
-
-    this.scene.input.setDraggable(itemSprite);
-    itemSprite.source = 'inventory';
-    itemSprite.slotIndex = emptyIndex;
-
-    inventory.container.add(itemSprite);
-    
-
-    inventory.items[emptyIndex] = {
-        type: item.key,
-        sprite: itemSprite,
-        price: item.price,
-        displaySize: 21
-    };
-
-
-
-    
-    
-}
     // Will add to this later, the price to which an item is sold should be able to be influnced by various factors (crop quality, demand etc.)
     sellItem(item) {
         const economy = this.scene.economy;

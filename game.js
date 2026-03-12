@@ -1,9 +1,12 @@
-import { Player } from './player.js';
+import { MainMenu } from './mainMenu.js';
 import { Hotbar } from './hotbar.js';
+import { Inventory } from './inventory.js';
+
+import { WorldManager } from './worldManager.js';
 import { FarmManager } from './farmManager.js';
 import { EconomyManager } from './economyManager.js';
-import { Inventory } from './inventory.js';
-import { MainMenu } from './mainMenu.js';
+
+import { Player } from './player.js';
 import { Merchant } from './merchant.js';
 
 class GameScene extends Phaser.Scene {
@@ -46,11 +49,12 @@ class GameScene extends Phaser.Scene {
     const tileset = map.addTilesetImage('grass', 'grassTiles');
     const ground = map.createLayer('Background', tileset, 0, 0); 
    
-    // this.map = map;
     this.farmManager = new FarmManager(this, map);
     // the number argument = gold, so change it to whatever you want 
-    this.economy = new EconomyManager(this, 10000); 
+    this.economy = new EconomyManager(this, 100); 
     this.merchant = new Merchant(this);
+    this.worldManager = new WorldManager(this);
+    this.worldManager.createUI();
      
     
     this.anims.create({
@@ -92,10 +96,11 @@ class GameScene extends Phaser.Scene {
     this.isUIOpen = false;
 
     this.backgroundMusic = this.sound.add('farmMusic', {
-    volume: 0.5,   // 0.0 = silent & 1.0 = full volume
-    loop: true     // loop the song
-  });
-  this.backgroundMusic.play();
+      volume: 0.5,   // 0.0 = silent & 1.0 = full volume
+      loop: true     // loop the song
+    });
+
+    this.backgroundMusic.play();
   }
   
   update(time, delta) {
@@ -106,11 +111,11 @@ class GameScene extends Phaser.Scene {
  
     if(this.player) {
       this.player.update();
-      
     }
 
     this.farmManager.update(this.player, time, delta);
-    this.merchant.update(time, delta)
+    this.merchant.update(time, delta);
+    this.worldManager.update(time,delta);
   }
 }
 
