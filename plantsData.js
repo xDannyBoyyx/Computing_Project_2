@@ -18,5 +18,14 @@ export const plantData = {
         harvestMax: 4,
         spriteSheet: "smallPlant",
         startFrame: 27
+    },
+    "wheat": {
+        nextStageTimer: 3500,
+        maxStage: 3,
+        sellValue: 6,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "mediumPlant", 
+        startFrame: 0 //TO BE CHANGED TO CORRECT FRAME NUMBER
     }
 }
