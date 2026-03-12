@@ -27,7 +27,8 @@ export class Hotbar {
         this.addTool('Hammer', 3);   
         this.addTool('Pickaxe', 4);  
         this.addTool('Scythe', 5);   
-        this.addTool('Shovel', 6);   
+        this.addTool('Shovel', 6);
+        this.addTool('wheatPouch', 7);
     }
     
     createSlots() {
