@@ -1,11 +1,11 @@
 import { Plant } from "./plants.js";
+import { plantData } from './plantsData.js';
 
 const pouchToPlant = {
     'wheatPouch': 'wheat',
     'carrotPouch': 'carrot',
     'raddishPouch': 'raddish',
     'cabbagePouch': 'cabbage'
-    
 };
 
 export class FarmManager {
@@ -74,32 +74,41 @@ export class FarmManager {
     }
 
     // --- Farming logic ---
-        handleFarmAction(x, y) {
-            if (this.scene.isUIOpen) return;
+    handleFarmAction(x, y) {
+        if (this.scene.isUIOpen) return;
 
-            const tile = this.getTile(x, y);
-            const hotbar = this.scene.hotbar;
-            const tool = hotbar.getSelectedTool();
+        const tile = this.getTile(x, y);
+        const hotbar = this.scene.hotbar;
+        const tool = hotbar.getSelectedTool();
 
-            // Gets the tool type 
-            const toolType = tool?.type ?? null;
+        // Gets the tool type 
+        const toolType = tool?.type ?? null;
 
-            if (toolType === 'Hoe' && !tile.tilled) {
-                this.till(x, y);
-            }
-                //check if its a pouch
-            else if (pouchToPlant[toolType] && tile.tilled && !tile.plant) {
-                const plantType = pouchToPlant[toolType]; // Get wheat from wheatPouch
+        if (toolType === 'Hoe' && !tile.tilled) {
+            this.till(x, y);
+        } 
+        // CHECK IF IT'S A POUCH:
+        else if (pouchToPlant[toolType] && tile.tilled && !tile.plant) {
+            // Use one seed from the pouch
+            const canPlant = hotbar.useSeed(hotbar.selectedSlot);
+            
+            if (canPlant) {
+                const plantType = pouchToPlant[toolType];
                 this.plant(x, y, plantType);
                 console.log(`Planted ${plantType} from ${toolType}`);
             }
-            else if (toolType === 'WateringCan' && tile.tilled) {
-                this.water(x, y);
-            }
-            else {
-                console.log("Harvest not implemented yet");
-            }
         }
+        else if (toolType === 'WateringCan' && tile.tilled) {
+            this.water(x, y);
+        }
+        // HARVEST: Click on fully grown plant with empty hand
+        else if (!toolType && tile.plant && tile.plant.harvestable) {
+            this.harvest(x, y);
+        }
+        else {
+            console.log("No valid action");
+        }
+    }
 
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily
@@ -203,7 +212,46 @@ export class FarmManager {
             // console.log("Planted", plantType, "at", x, y);
         }
     }
+
+    // Harvest a fully grown plant
+    harvest(x, y) {
+        const tile = this.getTile(x, y);
+        
+        // Can only harvest if there's a fully grown plant
+        if (tile.plant && tile.plant.harvestable) {
+            const plantType = tile.plant.type;
+            const data = plantData[plantType];
+            
+            // Random harvest amount based on plant data
+            const amount = Phaser.Math.Between(data.harvestMin, data.harvestMax);
+            const value = data.sellValue * amount;
+            
+            console.log(`Harvested ${amount} ${plantType}(s) worth ${value} gold`);
+            
+            // Add gold to player
+            if (this.scene.economy) {
+                this.scene.economy.addGold(value);
+            }
+            
+            // Remove the plant sprite
+            if (tile.plant.sprite) {
+                tile.plant.sprite.destroy();
+            }
+            
+            // Remove plant from array
+            const index = this.plantsArr.indexOf(tile.plant);
+            if (index > -1) {
+                this.plantsArr.splice(index, 1);
+            }
+            
+            // Clear tile data
+            tile.plant = null;
+            
+            console.log(`Harvested ${plantType}!`);
+        }
+    }
 }
+
 
 
 
