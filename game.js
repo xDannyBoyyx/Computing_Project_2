@@ -33,6 +33,11 @@ class GameScene extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64
     });
+    // ADD FEMALE SPRITE:
+    this.load.spritesheet('playerFemale', 'assets/femaleSS.png', {
+      frameWidth: 64,
+      frameHeight: 64
+    });
     this.load.spritesheet("smallPlant", "assets/SmallPlants.png", {
       frameWidth: 16,
       frameHeight: 32
@@ -48,7 +53,7 @@ class GameScene extends Phaser.Scene {
     this.load.audio("farmMusic", "assets/Magic Scout - Farm.mp3");
   }
   
-  create() {
+  create(data) { // ADD 'data' parameter to receive gender from menu
     const map = this.make.tilemap({ key: 'mapJson' });
     const tileset = map.addTilesetImage('grass', 'grassTiles');
     const ground = map.createLayer('Background', tileset, 0, 0); 
@@ -60,36 +65,39 @@ class GameScene extends Phaser.Scene {
     this.worldManager = new WorldManager(this);
     this.worldManager.createUI();
      
+    // Get selected gender from main menu (defaults to 'male' if not provided)
+    const selectedGender = data.gender || 'male';
+    const spriteKey = selectedGender === 'male' ? 'player' : 'playerFemale';
     
     this.anims.create({
       key: 'move-down',
-      frames: this.anims.generateFrameNumbers('player', {  frames: [15, 14, 13, 12, 0, 1, 2, 3] }),
+      frames: this.anims.generateFrameNumbers(spriteKey, {  frames: [15, 14, 13, 12, 0, 1, 2, 3] }),
       frameRate: 10,
       repeat: -1
     });
     
     this.anims.create({
       key: 'move-up',
-      frames: this.anims.generateFrameNumbers('player', { frames: [4, 5, 6, 7, 11, 10, 9, 8] }),
+      frames: this.anims.generateFrameNumbers(spriteKey, { frames: [4, 5, 6, 7, 11, 10, 9, 8] }),
       frameRate: 10,
       repeat: -1
     });
     
     this.anims.create({
       key: 'move-left',
-      frames: this.anims.generateFrameNumbers('player', { frames: [31, 30, 29, 25, 28, 27, 26, 24] }),
+      frames: this.anims.generateFrameNumbers(spriteKey, { frames: [31, 30, 29, 25, 28, 27, 26, 24] }),
       frameRate: 10,
       repeat: -1
     });
     
     this.anims.create({
       key: 'move-right',
-      frames: this.anims.generateFrameNumbers('player', { frames: [16, 17, 18, 22, 19, 20, 21, 23] }),
+      frames: this.anims.generateFrameNumbers(spriteKey, { frames: [16, 17, 18, 22, 19, 20, 21, 23] }),
       frameRate: 10,
       repeat: -1
     });
     
-    this.player = new Player(this, 320, 200);
+    this.player = new Player(this, 320, 200, selectedGender); // Pass gender to player
     this.cameras.main.startFollow(this.player.sprite);
     this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16);
     this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
