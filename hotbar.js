@@ -35,7 +35,7 @@ export class Hotbar {
         const slotCount = 10;
 
         for (let i = 0; i < slotCount; i++) {
-            let x = 130 + i * 40;
+            let x = 135 + i * 40;
             let y = 330;
 
             // Slot rectangle
