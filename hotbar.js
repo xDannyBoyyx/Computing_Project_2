@@ -15,7 +15,6 @@ export class Hotbar {
         this.createSlots();
         this.setupKeys();
         this.setupHoverEffects();
-        this.blockClickThrough();
 
         // intial tools/sprites
         this.addTool('Hoe', 0);
@@ -47,6 +46,10 @@ export class Hotbar {
 
             this.container.add(slot);
             this.slots.push(slot);
+
+            slot.on('pointerdown', () => {
+                this.selectSlot(i);
+            });
             
             let label = i === 9 ? '0' : (i + 1).toString();
             let text = this.scene.add.text(x - 10, y - 10, label, { fontSize: '10px' })
@@ -75,39 +78,24 @@ export class Hotbar {
                                pointer.y >= hotbarBounds.y && 
                                pointer.y <= hotbarBounds.y + hotbarBounds.height;
             
-            // Dim hotbar when hovering over it
+            // Dim hotbar and disable tool clicks when hovering over it
             if (isOverHotbar && !this.scene.isUIOpen) {
                 this.container.setAlpha(0.3);
+                // Disable interactivity on all tool sprites
+                this.tools.forEach(tool => {
+                    if (tool && tool.sprite) {
+                        tool.sprite.disableInteractive();
+                    }
+                });
             } else {
                 this.container.setAlpha(1);
+                // Re-enable interactivity on all tool sprites
+                this.tools.forEach(tool => {
+                    if (tool && tool.sprite) {
+                        tool.sprite.setInteractive();
+                    }
+                });
             }
-        });
-    }
-
-    blockClickThrough() {
-        // Create invisible blocker rectangle over entire hotbar
-        const blocker = this.scene.add.rectangle(
-            140 + (10 * 40) / 2 - 20, // center X
-            330,                       // center Y
-            10 * 40 + 40,             // width (covers all slots)
-            60,                        // height
-            0x000000,
-            0                          // invisible
-        )
-        .setScrollFactor(0)
-        .setDepth(650) // Just below hotbar
-        .setInteractive();
-
-        // Blocker absorbs all clicks - nothing happens when clicking it
-        blocker.on('pointerdown', (pointer) => {
-            // Click is absorbed here, doesn't reach farm manager
-            // But we still want to select slots, so check if clicking on a slot
-            this.slots.forEach((slot, index) => {
-                const bounds = slot.getBounds();
-                if (Phaser.Geom.Rectangle.Contains(bounds, pointer.x, pointer.y)) {
-                    this.selectSlot(index);
-                }
-            });
         });
     }
 
