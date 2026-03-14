@@ -74,15 +74,17 @@ export class FarmManager {
             return;
         }
 
+        // Declare hotbar and toolType once at the top
         const hotbar = this.scene.hotbar;
         const tool = hotbar.getSelectedTool();
         const toolType = tool?.type ?? null;
-    
+        
+        // Don't show highlight if no tool is selected
         if (!toolType) {
             this.tileHighlight.setVisible(false);
             return;
         }
-        
+
         const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
         const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
         
@@ -95,9 +97,6 @@ export class FarmManager {
 
         // Change color based on what action is available
         const tileData = this.getTile(tile.x, tile.y);
-        const hotbar = this.scene.hotbar;
-        const tool = hotbar.getSelectedTool();
-        const toolType = tool?.type ?? null;
 
         let color = 0xff0000; // Red = no action
         let alpha = 0.2;
