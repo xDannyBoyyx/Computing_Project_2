@@ -95,7 +95,7 @@ export class Hotbar {
             0                          // invisible
         )
         .setScrollFactor(0)
-        .setDepth(599) // Just below hotbar
+        .setDepth(650) // Just below hotbar
         .setInteractive();
 
         // Blocker absorbs all clicks - nothing happens when clicking it
