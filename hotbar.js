@@ -47,10 +47,6 @@ export class Hotbar {
 
             this.container.add(slot);
             this.slots.push(slot);
-
-            slot.on('pointerdown', () => {
-                this.selectSlot(i);
-            });
             
             let label = i === 9 ? '0' : (i + 1).toString();
             let text = this.scene.add.text(x - 10, y - 10, label, { fontSize: '10px' })
@@ -89,16 +85,31 @@ export class Hotbar {
     }
 
     blockClickThrough() {
-    this.slots.forEach((slot) => {
-        // Remove all existing pointerdown listeners
-        slot.removeAllListeners('pointerdown');
-        
-        // Add new listener that stops propagation
-        slot.on('pointerdown', (pointer, localX, localY, event) => {
-            event.stopPropagation(); // Stop click from going to farm manager
+        // Create invisible blocker rectangle over entire hotbar
+        const blocker = this.scene.add.rectangle(
+            140 + (10 * 40) / 2 - 20, // center X
+            330,                       // center Y
+            10 * 40 + 40,             // width (covers all slots)
+            60,                        // height
+            0x000000,
+            0                          // invisible
+        )
+        .setScrollFactor(0)
+        .setDepth(599) // Just below hotbar
+        .setInteractive();
+
+        // Blocker absorbs all clicks - nothing happens when clicking it
+        blocker.on('pointerdown', (pointer) => {
+            // Click is absorbed here, doesn't reach farm manager
+            // But we still want to select slots, so check if clicking on a slot
+            this.slots.forEach((slot, index) => {
+                const bounds = slot.getBounds();
+                if (Phaser.Geom.Rectangle.Contains(bounds, pointer.x, pointer.y)) {
+                    this.selectSlot(index);
+                }
+            });
         });
-    });
-}
+    }
 
     addTool(toolKey, slotIndex, size = 20, offsetX = 0, offsetY = 0) {
         if (slotIndex < 0 || slotIndex >= this.slots.length) return;
