@@ -89,13 +89,16 @@ export class Hotbar {
     }
 
     blockClickThrough() {
-        this.slots.forEach((slot, index) => {
-            slot.on('pointerdown', (pointer) => {
-                this.selectSlot(index);
-                pointer.event.stopPropagation(); // Stop click from going to farm manager
-            });
+    this.slots.forEach((slot) => {
+        // Remove all existing pointerdown listeners
+        slot.removeAllListeners('pointerdown');
+        
+        // Add new listener that stops propagation
+        slot.on('pointerdown', (pointer, localX, localY, event) => {
+            event.stopPropagation(); // Stop click from going to farm manager
         });
-    }
+    });
+}
 
     addTool(toolKey, slotIndex, size = 20, offsetX = 0, offsetY = 0) {
         if (slotIndex < 0 || slotIndex >= this.slots.length) return;
