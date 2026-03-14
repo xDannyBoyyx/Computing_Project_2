@@ -5,7 +5,6 @@ const pouchToPlant = {
     'carrotPouch': 'carrot',
     'raddishPouch': 'raddish',
     'cabbagePouch': 'cabbage'
-    
 };
 
 export class FarmManager {
@@ -23,8 +22,20 @@ export class FarmManager {
         // Done so that they can be accessed outside the plant function and update for example can be called
         this.plantsArr = [];
 
+        // Create tile highlight
+        this.createTileHighlight();
+
         // Sets up keyboard and mouse interaction
         this.setupInput();
+    }
+
+    createTileHighlight() {
+        // Create a rectangle that highlights the tile under cursor
+        this.tileHighlight = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize)
+            .setStrokeStyle(2, 0xffffff, 0.8)
+            .setFillStyle(0xffffff, 0.2)
+            .setDepth(1000)
+            .setVisible(false);
     }
 
     setupInput() {
@@ -45,10 +56,63 @@ export class FarmManager {
             // i reckon using left click for everything will be easier -D
         });
 
+        // Mouse move to update highlight
+        this.scene.input.on('pointermove', (pointer) => {
+            this.updateTileHighlight(pointer);
+        });
+
         // Keyboard input 
         this.interactKey = this.scene.input.keyboard.addKey(
             Phaser.Input.Keyboard.KeyCodes.E
         );        
+    }
+
+    updateTileHighlight(pointer) {
+        // Don't show highlight if UI is open
+        if (this.scene.isUIOpen) {
+            this.tileHighlight.setVisible(false);
+            return;
+        }
+
+        const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
+        const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
+        
+        // Position highlight at tile center
+        const worldX = tile.x * this.tileSize + this.tileSize / 2;
+        const worldY = tile.y * this.tileSize + this.tileSize / 2;
+        
+        this.tileHighlight.setPosition(worldX, worldY);
+        this.tileHighlight.setVisible(true);
+
+        // Change color based on what action is available
+        const tileData = this.getTile(tile.x, tile.y);
+        const hotbar = this.scene.hotbar;
+        const tool = hotbar.getSelectedTool();
+        const toolType = tool?.type ?? null;
+
+        let color = 0xff0000; // Red = no action
+        let alpha = 0.2;
+
+        // Check what action can be performed
+        if (toolType === 'Hoe' && !tileData.tilled) {
+            color = 0x8b4513; // Brown = can till
+            alpha = 0.3;
+        } 
+        else if (pouchToPlant[toolType] && tileData.tilled && !tileData.plant) {
+            color = 0x00ff00; // Green = can plant
+            alpha = 0.3;
+        }
+        else if (toolType === 'WateringCan' && tileData.tilled && !tileData.watered) {
+            color = 0x00bfff; // Blue = can water
+            alpha = 0.3;
+        }
+        else if (toolType === 'Scythe' && tileData.plant && tileData.plant.harvestable) {
+            color = 0xffff00; // Yellow = can harvest
+            alpha = 0.4;
+        }
+
+        this.tileHighlight.setFillStyle(color, alpha);
+        this.tileHighlight.setStrokeStyle(2, color, 0.8);
     }
 
      // can now call this inside game.js
@@ -74,32 +138,32 @@ export class FarmManager {
     }
 
     // --- Farming logic ---
-        handleFarmAction(x, y) {
-            if (this.scene.isUIOpen) return;
+    handleFarmAction(x, y) {
+        if (this.scene.isUIOpen) return;
 
-            const tile = this.getTile(x, y);
-            const hotbar = this.scene.hotbar;
-            const tool = hotbar.getSelectedTool();
+        const tile = this.getTile(x, y);
+        const hotbar = this.scene.hotbar;
+        const tool = hotbar.getSelectedTool();
 
-            // Gets the tool type 
-            const toolType = tool?.type ?? null;
+        // Gets the tool type 
+        const toolType = tool?.type ?? null;
 
-            if (toolType === 'Hoe' && !tile.tilled) {
-                this.till(x, y);
-            }
-                //check if its a pouch
-            else if (pouchToPlant[toolType] && tile.tilled && !tile.plant) {
-                const plantType = pouchToPlant[toolType]; // Get wheat from wheatPouch
-                this.plant(x, y, plantType);
-                console.log(`Planted ${plantType} from ${toolType}`);
-            }
-            else if (toolType === 'WateringCan' && tile.tilled) {
-                this.water(x, y);
-            }
-            else {
-                console.log("Harvest not implemented yet");
-            }
+        if (toolType === 'Hoe' && !tile.tilled) {
+            this.till(x, y);
         }
+        //check if its a pouch
+        else if (pouchToPlant[toolType] && tile.tilled && !tile.plant) {
+            const plantType = pouchToPlant[toolType]; // Get wheat from wheatPouch
+            this.plant(x, y, plantType);
+            console.log(`Planted ${plantType} from ${toolType}`);
+        }
+        else if (toolType === 'WateringCan' && tile.tilled) {
+            this.water(x, y);
+        }
+        else {
+            console.log("Harvest not implemented yet");
+        }
+    }
 
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily
