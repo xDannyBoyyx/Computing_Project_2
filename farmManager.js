@@ -74,6 +74,15 @@ export class FarmManager {
             return;
         }
 
+        const hotbar = this.scene.hotbar;
+        const tool = hotbar.getSelectedTool();
+        const toolType = tool?.type ?? null;
+    
+        if (!toolType) {
+            this.tileHighlight.setVisible(false);
+            return;
+        }
+        
         const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
         const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
         
