@@ -63,41 +63,53 @@ export class Hotbar {
     }
 
     setupHoverEffects() {
-        // Track mouse movement to dim hotbar when hovering
-        this.scene.input.on('pointermove', (pointer) => {
-            const hotbarBounds = {
-                x: 140 - 20,
-                y: 330 - 20,
-                width: 10 * 40 + 40,
-                height: 60
-            };
+    // Track mouse movement to dim hotbar when hovering
+    this.scene.input.on('pointermove', (pointer) => {
+        const hotbarBounds = {
+            x: 140 - 20,
+            y: 330 - 20,
+            width: 10 * 40 + 40,
+            height: 60
+        };
+        
+        // Check if pointer is over hotbar
+        const isOverHotbar = pointer.x >= hotbarBounds.x && 
+                           pointer.x <= hotbarBounds.x + hotbarBounds.width &&
+                           pointer.y >= hotbarBounds.y && 
+                           pointer.y <= hotbarBounds.y + hotbarBounds.height;
+        
+        // Dim hotbar and disable all clicks when hovering over it
+        if (isOverHotbar && !this.scene.isUIOpen) {
+            this.container.setAlpha(0.3);
             
-            // Check if pointer is over hotbar
-            const isOverHotbar = pointer.x >= hotbarBounds.x && 
-                               pointer.x <= hotbarBounds.x + hotbarBounds.width &&
-                               pointer.y >= hotbarBounds.y && 
-                               pointer.y <= hotbarBounds.y + hotbarBounds.height;
+            // Disable interactivity on slots
+            this.slots.forEach(slot => {
+                slot.disableInteractive();
+            });
             
-            // Dim hotbar and disable tool clicks when hovering over it
-            if (isOverHotbar && !this.scene.isUIOpen) {
-                this.container.setAlpha(0.3);
-                // Disable interactivity on all tool sprites
-                this.tools.forEach(tool => {
-                    if (tool && tool.sprite) {
-                        tool.sprite.disableInteractive();
-                    }
-                });
-            } else {
-                this.container.setAlpha(1);
-                // Re-enable interactivity on all tool sprites
-                this.tools.forEach(tool => {
-                    if (tool && tool.sprite) {
-                        tool.sprite.setInteractive();
-                    }
-                });
-            }
-        });
-    }
+            // Disable interactivity on all tool sprites
+            this.tools.forEach(tool => {
+                if (tool && tool.sprite) {
+                    tool.sprite.disableInteractive();
+                }
+            });
+        } else {
+            this.container.setAlpha(1);
+            
+            // Re-enable interactivity on slots
+            this.slots.forEach(slot => {
+                slot.setInteractive();
+            });
+            
+            // Re-enable interactivity on all tool sprites
+            this.tools.forEach(tool => {
+                if (tool && tool.sprite) {
+                    tool.sprite.setInteractive();
+                }
+            });
+        }
+    });
+}
 
     addTool(toolKey, slotIndex, size = 20, offsetX = 0, offsetY = 0) {
         if (slotIndex < 0 || slotIndex >= this.slots.length) return;
