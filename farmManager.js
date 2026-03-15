@@ -35,6 +35,7 @@ export class FarmManager {
             .setStrokeStyle(2, 0xffffff, 0.8)
             .setFillStyle(0xffffff, 0.2)
             .setDepth(1000)
+            .setScrollFactor(1, 1)
             .setVisible(false);
     }
 
