@@ -87,19 +87,15 @@ export class FarmManager {
     }
 
     // USE THE SAME METHOD AS CLICKING - positionToCamera
-    const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
-    const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
-
-    console.log('Pointer screen:', pointer.x, pointer.y);
-    console.log('World point:', worldPoint.x, worldPoint.y);
-    console.log('Tile coords:', tile.x, tile.y);
-    console.log('Camera scroll:', this.scene.cameras.main.scrollX, this.scene.cameras.main.scrollY);
+    const worldX = pointer.x + this.scene.cameras.main.scrollX;
+    const worldY = pointer.y + this.scene.cameras.main.scrollY;
     
-    // Position highlight at tile center (in world coordinates)
-    const worldX = tile.x * this.tileSize + this.tileSize / 2;
-    const worldY = tile.y * this.tileSize + this.tileSize / 2;
+    const tile = this.worldToTileXY(worldX, worldY);
     
-    this.tileHighlight.setPosition(worldX, worldY);
+    const highlightX = tile.x * this.tileSize + this.tileSize / 2;
+    const highlightY = tile.y * this.tileSize + this.tileSize / 2;
+    
+    this.tileHighlight.setPosition(highlightX, highlightY);
     this.tileHighlight.setVisible(true);
 
     // Change color based on what action is available
