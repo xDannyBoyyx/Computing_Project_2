@@ -89,6 +89,11 @@ export class FarmManager {
     // USE THE SAME METHOD AS CLICKING - positionToCamera
     const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
     const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
+
+    console.log('Pointer screen:', pointer.x, pointer.y);
+    console.log('World point:', worldPoint.x, worldPoint.y);
+    console.log('Tile coords:', tile.x, tile.y);
+    console.log('Camera scroll:', this.scene.cameras.main.scrollX, this.scene.cameras.main.scrollY);
     
     // Position highlight at tile center (in world coordinates)
     const worldX = tile.x * this.tileSize + this.tileSize / 2;
