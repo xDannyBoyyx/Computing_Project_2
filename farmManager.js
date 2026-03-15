@@ -85,8 +85,8 @@ export class FarmManager {
         return;
     }
 
-    // UPDATED: Get world coordinates properly accounting for camera
-    const worldPoint = this.scene.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    // USE THE SAME METHOD AS CLICKING - positionToCamera
+    const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
     const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
     
     // Position highlight at tile center (in world coordinates)
