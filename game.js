@@ -98,7 +98,7 @@ class GameScene extends Phaser.Scene {
     });
     
     this.player = new Player(this, 320, 200, selectedGender); // Pass gender to player
-    this.cameras.main.startFollow(this.player.sprite);
+    this.cameras.main.startFollow(this.player.sprite, false, 0.1, 0.1);
     this.cameras.main.setDeadzone(100, 50);
     this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16);
     this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
