@@ -68,61 +68,62 @@ export class FarmManager {
     }
 
     updateTileHighlight(pointer) {
-        // Don't show highlight if UI is open
-        if (this.scene.isUIOpen) {
-            this.tileHighlight.setVisible(false);
-            return;
-        }
-
-        // Declare hotbar and toolType once at the top
-        const hotbar = this.scene.hotbar;
-        const tool = hotbar.getSelectedTool();
-        const toolType = tool?.type ?? null;
-        
-        // Don't show highlight if no tool is selected
-        if (!toolType) {
-            this.tileHighlight.setVisible(false);
-            return;
-        }
-
-        const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
-        const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
-        
-        // Position highlight at tile center
-        const worldX = tile.x * this.tileSize + this.tileSize / 2;
-        const worldY = tile.y * this.tileSize + this.tileSize / 2;
-        
-        this.tileHighlight.setPosition(worldX, worldY);
-        this.tileHighlight.setScrollFactor(1);
-        this.tileHighlight.setVisible(true);
-
-        // Change color based on what action is available
-        const tileData = this.getTile(tile.x, tile.y);
-
-        let color = 0xff0000; // Red = no action
-        let alpha = 0.2;
-
-        // Check what action can be performed
-        if (toolType === 'Hoe' && !tileData.tilled) {
-            color = 0x8b4513; // Brown = can till
-            alpha = 0.3;
-        } 
-        else if (pouchToPlant[toolType] && tileData.tilled && !tileData.plant) {
-            color = 0x00ff00; // Green = can plant
-            alpha = 0.3;
-        }
-        else if (toolType === 'WateringCan' && tileData.tilled && !tileData.watered) {
-            color = 0x00bfff; // Blue = can water
-            alpha = 0.3;
-        }
-        else if (toolType === 'Scythe' && tileData.plant && tileData.plant.harvestable) {
-            color = 0xffff00; // Yellow = can harvest
-            alpha = 0.4;
-        }
-
-        this.tileHighlight.setFillStyle(color, alpha);
-        this.tileHighlight.setStrokeStyle(2, color, 0.8);
+    // Don't show highlight if UI is open
+    if (this.scene.isUIOpen) {
+        this.tileHighlight.setVisible(false);
+        return;
     }
+
+    // Declare hotbar and toolType once at the top
+    const hotbar = this.scene.hotbar;
+    const tool = hotbar.getSelectedTool();
+    const toolType = tool?.type ?? null;
+    
+    // Don't show highlight if no tool is selected
+    if (!toolType) {
+        this.tileHighlight.setVisible(false);
+        return;
+    }
+
+    // UPDATED: Get world coordinates properly accounting for camera
+    const worldPoint = this.scene.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
+    
+    // Position highlight at tile center (in world coordinates)
+    const worldX = tile.x * this.tileSize + this.tileSize / 2;
+    const worldY = tile.y * this.tileSize + this.tileSize / 2;
+    
+    this.tileHighlight.setPosition(worldX, worldY);
+    this.tileHighlight.setScrollFactor(1);
+    this.tileHighlight.setVisible(true);
+
+    // Change color based on what action is available
+    const tileData = this.getTile(tile.x, tile.y);
+
+    let color = 0xff0000; // Red = no action
+    let alpha = 0.2;
+
+    // Check what action can be performed
+    if (toolType === 'Hoe' && !tileData.tilled) {
+        color = 0x8b4513; // Brown = can till
+        alpha = 0.3;
+    } 
+    else if (pouchToPlant[toolType] && tileData.tilled && !tileData.plant) {
+        color = 0x00ff00; // Green = can plant
+        alpha = 0.3;
+    }
+    else if (toolType === 'WateringCan' && tileData.tilled && !tileData.watered) {
+        color = 0x00bfff; // Blue = can water
+        alpha = 0.3;
+    }
+    else if (toolType === 'Scythe' && tileData.plant && tileData.plant.harvestable) {
+        color = 0xffff00; // Yellow = can harvest
+        alpha = 0.4;
+    }
+
+    this.tileHighlight.setFillStyle(color, alpha);
+    this.tileHighlight.setStrokeStyle(2, color, 0.8);
+}
 
      // can now call this inside game.js
     update(player, time, delta) {
