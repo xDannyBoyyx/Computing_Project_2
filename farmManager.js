@@ -94,7 +94,6 @@ export class FarmManager {
     const worldY = tile.y * this.tileSize + this.tileSize / 2;
     
     this.tileHighlight.setPosition(worldX, worldY);
-    this.tileHighlight.setScrollFactor(1);
     this.tileHighlight.setVisible(true);
 
     // Change color based on what action is available
