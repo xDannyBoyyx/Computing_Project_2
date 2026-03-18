@@ -1,4 +1,5 @@
 import { MainMenu } from './mainMenu.js';
+import { SettingsMenu } from './settingsMenu.js';
 import { Hotbar } from './hotbar.js';
 import { Inventory } from './inventory.js';
 
@@ -139,7 +140,7 @@ const config = {
     disableWebAudio: false, // this makes it so the music still plays when on another tab
     noAudio: false
   },
-  scene: [MainMenu,GameScene] //Switch MainMenu & GameScene if you don't want to see the main menu every time.
+  scene: [MainMenu,GameScene,SettingsMenu] //Switch MainMenu & GameScene if you don't want to see the main menu every time.
 };
 
 const game = new Phaser.Game(config);   

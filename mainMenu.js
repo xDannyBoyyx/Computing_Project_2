@@ -24,6 +24,7 @@ export class MainMenu extends Phaser.Scene {
         optionsButton.setInteractive({ useHandCursor: true });
         optionsButton.on('pointerdown', () => {
             console.log('Options clicked');
+            this.scene.launch('SettingsMenu');
         });
         
         // EXIT button
