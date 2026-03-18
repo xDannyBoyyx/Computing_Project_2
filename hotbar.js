@@ -14,10 +14,11 @@ export class Hotbar {
 
         this.createSlots();
         this.setupKeys();
+        this.setupHoverEffects();
 
         // intial tools/sprites
         this.addTool('Hoe', 0);
-        this.addTool('WateringCan', 1 );
+        this.addTool('WateringCan', 1);
         
         // These don't do anything yet, just there to sell and purchase tools for the merchant class for now
 
@@ -27,15 +28,14 @@ export class Hotbar {
         this.addTool('Hammer', 3);   
         this.addTool('Pickaxe', 4);  
         this.addTool('Scythe', 5);   
-        this.addTool('Shovel', 6);
-        this.addTool('wheatPouch', 7);
+        this.addTool('Shovel', 6);   
     }
     
     createSlots() {
         const slotCount = 10;
 
         for (let i = 0; i < slotCount; i++) {
-            let x = 130 + i * 40;
+            let x = 140 + i * 40;
             let y = 330;
 
             // Slot rectangle
@@ -62,15 +62,67 @@ export class Hotbar {
         this.highlightSlot();
     }
 
+    setupHoverEffects() {
+    // Track mouse movement to dim hotbar when hovering
+    this.scene.input.on('pointermove', (pointer) => {
+        const hotbarBounds = {
+            x: 140 - 20,
+            y: 330 - 20,
+            width: 10 * 40 + 40,
+            height: 60
+        };
+        
+        // Check if pointer is over hotbar
+        const isOverHotbar = pointer.x >= hotbarBounds.x && 
+                           pointer.x <= hotbarBounds.x + hotbarBounds.width &&
+                           pointer.y >= hotbarBounds.y && 
+                           pointer.y <= hotbarBounds.y + hotbarBounds.height;
+        
+        // Dim hotbar and disable all clicks when hovering over it
+        if (isOverHotbar && !this.scene.isUIOpen) {
+            this.container.setAlpha(0.3);
+            
+            // Disable interactivity on slots
+            this.slots.forEach(slot => {
+                slot.disableInteractive();
+            });
+            
+            // Disable interactivity on all tool sprites
+            this.tools.forEach(tool => {
+                if (tool && tool.sprite) {
+                    tool.sprite.disableInteractive();
+                }
+            });
+        } else {
+            this.container.setAlpha(1);
+            
+            // Re-enable interactivity on slots
+            this.slots.forEach(slot => {
+                slot.setInteractive();
+            });
+            
+            // Re-enable interactivity on all tool sprites
+            this.tools.forEach(tool => {
+                if (tool && tool.sprite) {
+                    tool.sprite.setInteractive();
+                }
+            });
+        }
+    });
+}
+
     addTool(toolKey, slotIndex, size = 20, offsetX = 0, offsetY = 0) {
         if (slotIndex < 0 || slotIndex >= this.slots.length) return;
 
         // removes sprite/tool if present
         if (this.tools[slotIndex]?.sprite) {
             this.tools[slotIndex].sprite.destroy();
+            // Also destroy seed count text if it exists
+            if (this.tools[slotIndex].seedCountText) {
+                this.tools[slotIndex].seedCountText.destroy();
+            }
         }
         
-        // Don't have to add a tool here each time I want to do something, can now just drag it from inv
         let slot = this.slots[slotIndex];
         let toolImage = this.scene.add.image(slot.x + offsetX, slot.y + offsetY, toolKey)
             .setDisplaySize(size, size)
@@ -90,11 +142,55 @@ export class Hotbar {
         toolImage.source = 'hotbar';
 
         this.container.add(toolImage);
-        this.tools[slotIndex] = { type: toolKey, sprite: toolImage };
+        
+        // Check if it's a pouch and add seed count
+        let seedCountText = null;
+        let seedCount = null;
+        
+        if (toolKey.includes('Pouch')) {
+            seedCount = 5; // Start with 5 seeds
+            seedCountText = this.scene.add.text(slot.x + 10, slot.y + 10, seedCount.toString(), {
+                fontSize: '12px',
+                color: '#ffffff',
+                fontStyle: 'bold',
+                backgroundColor: '#000000'
+            }).setOrigin(0.5).setScrollFactor(0);
+            
+            this.container.add(seedCountText);
+        }
+        
+        this.tools[slotIndex] = { 
+            type: toolKey, 
+            sprite: toolImage,
+            seedCount: seedCount,
+            seedCountText: seedCountText
+        };
+    }
+
+    useSeed(slotIndex) {
+        const tool = this.tools[slotIndex];
+        
+        if (!tool || !tool.seedCount) return true; // Not a pouch, allow planting
+        
+        tool.seedCount--;
+        
+        if (tool.seedCountText) {
+            tool.seedCountText.setText(tool.seedCount.toString());
+        }
+        
+        // If no seeds left, remove the pouch
+        if (tool.seedCount <= 0) {
+            if (tool.sprite) tool.sprite.destroy();
+            if (tool.seedCountText) tool.seedCountText.destroy();
+            this.tools[slotIndex] = null;
+            return false; // No more seeds
+        }
+        
+        return true; // Still has seeds
     }
 
     highlightSlot() {
-        for (let i = 0; i < this.slots.length; i++) {
+        for (let i = 0; i < 10; i++) {
             this.slots[i].setStrokeStyle(2, 0xffffff);
         }
         this.slots[this.selectedSlot].setStrokeStyle(3, 0xffff00);

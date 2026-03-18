@@ -1,12 +1,19 @@
 export class Merchant {
     constructor(scene) {
         this.scene = scene;
+        // The main reason the hitboxes were all over the place was because I didn't have a static camera
+        this.uiCamera = this.scene.cameras.add(0, 0, this.scene.scale.width, this.scene.scale.height);
+        this.uiCamera.setScroll(0, 0);
         this.isOpen = false;
 
         this.container = this.scene.add.container(0, 0)
-            .setScrollFactor(0)
-            .setDepth(1000)
-            .setVisible(false);
+        .setDepth(1000)
+        .setVisible(false);
+
+        this.scene.cameras.main.ignore(this.container);
+
+        this.uiCamera = this.scene.cameras.add(0, 0, this.scene.scale.width, this.scene.scale.height);
+        this.uiCamera.setScroll(0, 0);
 
         // Items merchant sells (if you want to add to this, add the image under the preload function in game.js then come back here to format it)
         this.itemsForSale = [
@@ -17,6 +24,10 @@ export class Merchant {
             { key: 'Hammer', price: 30, displaySize: 21 },
             { key: 'Scythe', price: 60, displaySize: 21 },
             { key: 'Shovel', price: 25, displaySize: 21 },
+            { key: 'wheatPouch', price: 30, displaySize: 21 },
+            { key: 'carrotPouch', price: 25, displaySize: 21 },
+            { key: 'raddishPouch', price: 35, displaySize: 21 },
+            { key: 'cabbagePouch', price: 40, displaySize: 21 },
         ];
 
         this.currentMode = 'buy';
@@ -29,27 +40,37 @@ export class Merchant {
     }
 
     createUI() {
-        this.panel = this.scene.add.rectangle(320, 180, 440, 360, 0x2a2a2a)
+        //Camera now fixed
+        const centerX = this.scene.cameras.main.width / 2;
+        const centerY = this.scene.cameras.main.height / 2;
+
+        this.panel = this.scene.add.rectangle(centerX, centerY, 440, 360, 0x2a2a2a)
             .setStrokeStyle(3, 0xffffff);
         this.container.add(this.panel);
         
-        this.title = this.scene.add.text(320, 80, 'MERCHANT', { fontSize: '20px', color: '#ffffff' }).setOrigin(0.5);
+        this.title = this.scene.add.text(centerX, centerY - 100, 'MERCHANT', {
+            fontSize: '20px',
+            color: '#ffffff'
+        }).setOrigin(0.5);
         this.container.add(this.title);
 
         const controlsY = this.panel.y + this.panel.height / 2 - 30;
 
-        this.modeIndicator = this.scene.add.text(320, controlsY - 22, 'BUY', {
+        // Large invisible hitbox so I can debug
+        this.modeButtonBG = this.scene.add.rectangle(centerX, controlsY - 18, 180, 30, 0x000000, 0) //change the last arguement into a 2 to see it
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => this.toggleMode());
+
+        this.container.add(this.modeButtonBG);
+
+        // Visible text
+        this.modeIndicator = this.scene.add.text(centerX, controlsY - 22, 'BUY', {
             fontSize: '26px',
             fontStyle: 'bold',
             color: '#00ff00'
         }).setOrigin(0.5);
-        this.container.add(this.modeIndicator);
-        
-        this.modeButtonBG = this.scene.add.rectangle(320, controlsY, 240, 40, 0x000000, 0)
-        .setInteractive({ useHandCursor: true })
-        .on('pointerdown', () => this.toggleMode());
 
-        this.container.add(this.modeButtonBG);
+        this.container.add(this.modeIndicator);
 
         // prev or next butttons
         const prevHitbox = this.scene.add.rectangle(200, controlsY, 110, 40, 0x000000, 0)
@@ -170,8 +191,8 @@ export class Merchant {
         const items = this.getCurrentItems();
         const pageItems = items.slice(this.currentPage * this.itemsPerPage, (this.currentPage + 1) * this.itemsPerPage);
 
-        const startX = 180;
-        const startY = 120;
+        const startX = this.panel.x - 140;
+        const startY = this.panel.y - 60;
         const slotSpacingX = 70;
         const slotSpacingY = 70;
         const slotSize = 55; 
@@ -263,4 +284,10 @@ export class Merchant {
     update(time, delta) {
         if (!this.isOpen) return;
     }
+
 }
+
+
+
+
+
