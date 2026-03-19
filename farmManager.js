@@ -1,4 +1,5 @@
 import { Plant } from "./plants.js";
+import { plantData } from './plantsData.js';
 
 const pouchToPlant = {
     'wheatPouch': 'wheat',
@@ -24,6 +25,9 @@ export class FarmManager {
 
         // Create tile highlight
         this.createTileHighlight();
+        
+        // CREATE PLANT TOOLTIP
+        this.createPlantTooltip();
 
         // Sets up keyboard and mouse interaction
         this.setupInput();
@@ -39,6 +43,46 @@ export class FarmManager {
             .setVisible(false);
     }
 
+    createPlantTooltip() {
+        // Background panel
+        this.tooltipBg = this.scene.add.rectangle(0, 0, 150, 60, 0x000000, 0.8)
+            .setOrigin(0, 1)
+            .setDepth(2000)
+            .setScrollFactor(0)
+            .setVisible(false);
+        
+        // Plant name text
+        this.tooltipName = this.scene.add.text(0, 0, '', {
+            fontSize: '12px',
+            color: '#ffffff',
+            fontStyle: 'bold'
+        })
+            .setOrigin(0, 1)
+            .setDepth(2001)
+            .setScrollFactor(0)
+            .setVisible(false);
+        
+        // Growth stage text
+        this.tooltipStage = this.scene.add.text(0, 0, '', {
+            fontSize: '10px',
+            color: '#aaaaaa'
+        })
+            .setOrigin(0, 1)
+            .setDepth(2001)
+            .setScrollFactor(0)
+            .setVisible(false);
+        
+        // Time remaining text
+        this.tooltipTime = this.scene.add.text(0, 0, '', {
+            fontSize: '10px',
+            color: '#ffff00'
+        })
+            .setOrigin(0, 1)
+            .setDepth(2001)
+            .setScrollFactor(0)
+            .setVisible(false);
+    }
+
     setupInput() {
         // Mouse input
         this.scene.input.on('pointerdown', (pointer) => {
@@ -48,18 +92,12 @@ export class FarmManager {
             if (pointer.leftButtonDown()) {
                 this.handleFarmAction(tile.x, tile.y);
             }
-            // got rid of the third parameter since it'll only be using left click -D
-
-            // if (pointer.rightButtonDown()) {
-            //     this.handleFarmAction(tile.x, tile.y, "secondary");
-            // }
-
-            // i reckon using left click for everything will be easier -D
         });
 
-        // Mouse move to update highlight
+        // Mouse move to update highlight and tooltip
         this.scene.input.on('pointermove', (pointer) => {
             this.updateTileHighlight(pointer);
+            this.updatePlantTooltip(pointer);
         });
 
         // Keyboard input 
@@ -69,64 +107,128 @@ export class FarmManager {
     }
 
     updateTileHighlight(pointer) {
-    // Don't show highlight if UI is open
-    if (this.scene.isUIOpen) {
-        this.tileHighlight.setVisible(false);
-        return;
+        // Don't show highlight if UI is open
+        if (this.scene.isUIOpen) {
+            this.tileHighlight.setVisible(false);
+            return;
+        }
+
+        // Declare hotbar and toolType once at the top
+        const hotbar = this.scene.hotbar;
+        const tool = hotbar.getSelectedTool();
+        const toolType = tool?.type ?? null;
+        
+        // Don't show highlight if no tool is selected
+        if (!toolType) {
+            this.tileHighlight.setVisible(false);
+            return;
+        }
+
+        // USE THE SAME METHOD AS CLICKING
+        const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
+        const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
+        
+        // Position highlight at tile center (in world coordinates)
+        const worldX = tile.x * this.tileSize + this.tileSize / 2;
+        const worldY = tile.y * this.tileSize + this.tileSize / 2;
+        
+        this.tileHighlight.setPosition(worldX, worldY);
+        this.tileHighlight.setVisible(true);
+
+        // Change color based on what action is available
+        const tileData = this.getTile(tile.x, tile.y);
+
+        let color = 0xff0000; // Red = no action
+        let alpha = 0.2;
+
+        // Check what action can be performed
+        if (toolType === 'Hoe' && !tileData.tilled) {
+            color = 0x8b4513; // Brown = can till
+            alpha = 0.3;
+        } 
+        else if (pouchToPlant[toolType] && tileData.tilled && !tileData.plant) {
+            color = 0x00ff00; // Green = can plant
+            alpha = 0.3;
+        }
+        else if (toolType === 'WateringCan' && tileData.tilled && !tileData.watered) {
+            color = 0x00bfff; // Blue = can water
+            alpha = 0.3;
+        }
+        else if (toolType === 'Scythe' && tileData.plant && tileData.plant.harvestable) {
+            color = 0xffff00; // Yellow = can harvest
+            alpha = 0.4;
+        }
+
+        this.tileHighlight.setFillStyle(color, alpha);
+        this.tileHighlight.setStrokeStyle(2, color, 0.8);
     }
 
-    // Declare hotbar and toolType once at the top
-    const hotbar = this.scene.hotbar;
-    const tool = hotbar.getSelectedTool();
-    const toolType = tool?.type ?? null;
-    
-    // Don't show highlight if no tool is selected
-    if (!toolType) {
-        this.tileHighlight.setVisible(false);
-        return;
+    updatePlantTooltip(pointer) {
+        // Don't show if UI is open
+        if (this.scene.isUIOpen) {
+            this.hideTooltip();
+            return;
+        }
+
+        // Get tile under cursor
+        const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
+        const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
+        const tileData = this.getTile(tile.x, tile.y);
+
+        // Check if there's a plant on this tile
+        if (!tileData.plant) {
+            this.hideTooltip();
+            return;
+        }
+
+        const plant = tileData.plant;
+        const plantName = plant.type.charAt(0).toUpperCase() + plant.type.slice(1); // Capitalize
+        
+        // Calculate time remaining
+        let timeText = '';
+        if (plant.harvestable) {
+            timeText = 'Ready to harvest!';
+        } else {
+            const timeLeft = plant.nextStageTimer - plant.timer;
+            const secondsLeft = Math.ceil(timeLeft / 1000);
+            timeText = `${secondsLeft}s until next stage`;
+        }
+        
+        // Stage info
+        const stageText = `Stage ${plant.stage + 1}/${plant.maxStage + 1}`;
+        
+        // Position tooltip near cursor (offset so it doesn't cover the plant)
+        const tooltipX = pointer.x + 15;
+        const tooltipY = pointer.y - 10;
+        
+        // Update tooltip content
+        this.tooltipName.setText(plantName);
+        this.tooltipStage.setText(stageText);
+        this.tooltipTime.setText(timeText);
+        
+        // Position background
+        this.tooltipBg.setPosition(tooltipX, tooltipY);
+        
+        // Position texts (stacked vertically inside the background)
+        this.tooltipName.setPosition(tooltipX + 5, tooltipY - 50);
+        this.tooltipStage.setPosition(tooltipX + 5, tooltipY - 35);
+        this.tooltipTime.setPosition(tooltipX + 5, tooltipY - 20);
+        
+        // Show tooltip
+        this.tooltipBg.setVisible(true);
+        this.tooltipName.setVisible(true);
+        this.tooltipStage.setVisible(true);
+        this.tooltipTime.setVisible(true);
     }
 
-    // USE THE SAME METHOD AS CLICKING - positionToCamera
-    const worldX = pointer.x + this.scene.cameras.main.scrollX;
-    const worldY = pointer.y + this.scene.cameras.main.scrollY;
-    
-    const tile = this.worldToTileXY(worldX, worldY);
-    
-    const highlightX = tile.x * this.tileSize + this.tileSize / 2;
-    const highlightY = tile.y * this.tileSize + this.tileSize / 2;
-    
-    this.tileHighlight.setPosition(highlightX, highlightY);
-    this.tileHighlight.setVisible(true);
-
-    // Change color based on what action is available
-    const tileData = this.getTile(tile.x, tile.y);
-
-    let color = 0xff0000; // Red = no action
-    let alpha = 0.2;
-
-    // Check what action can be performed
-    if (toolType === 'Hoe' && !tileData.tilled) {
-        color = 0x8b4513; // Brown = can till
-        alpha = 0.3;
-    } 
-    else if (pouchToPlant[toolType] && tileData.tilled && !tileData.plant) {
-        color = 0x00ff00; // Green = can plant
-        alpha = 0.3;
-    }
-    else if (toolType === 'WateringCan' && tileData.tilled && !tileData.watered) {
-        color = 0x00bfff; // Blue = can water
-        alpha = 0.3;
-    }
-    else if (toolType === 'Scythe' && tileData.plant && tileData.plant.harvestable) {
-        color = 0xffff00; // Yellow = can harvest
-        alpha = 0.4;
+    hideTooltip() {
+        this.tooltipBg.setVisible(false);
+        this.tooltipName.setVisible(false);
+        this.tooltipStage.setVisible(false);
+        this.tooltipTime.setVisible(false);
     }
 
-    this.tileHighlight.setFillStyle(color, alpha);
-    this.tileHighlight.setStrokeStyle(2, color, 0.8);
-}
-
-     // can now call this inside game.js
+    // can now call this inside game.js
     update(player, time, delta) {
         if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
             const tile = this.worldToTileXY(player.sprite.x, player.sprite.y);
@@ -164,9 +266,14 @@ export class FarmManager {
         }
         //check if its a pouch
         else if (pouchToPlant[toolType] && tile.tilled && !tile.plant) {
-            const plantType = pouchToPlant[toolType]; // Get wheat from wheatPouch
-            this.plant(x, y, plantType);
-            console.log(`Planted ${plantType} from ${toolType}`);
+            // Use one seed from the pouch
+            const canPlant = hotbar.useSeed(hotbar.selectedSlot);
+            
+            if (canPlant) {
+                const plantType = pouchToPlant[toolType];
+                this.plant(x, y, plantType);
+                console.log(`Planted ${plantType} from ${toolType}`);
+            }
         }
         else if (toolType === 'WateringCan' && tile.tilled) {
             this.water(x, y);
@@ -210,21 +317,6 @@ export class FarmManager {
         if (!tile.tilled) {
             tile.tilled = true;
 
-            // --- VISUAL PLACEHOLDER ---
-            // We don't have many assets yet, so I'll draw a brown square for now
-            // This shows the player the tile is tilled
-
-            // const worldX = x * this.tileSize;
-            // const worldY = y * this.tileSize;
-
-            // const rect = this.scene.add.rect(
-            //     worldX + 8,  // center of tile
-            //     worldY + 8,
-            //     16,          // width
-            //     16,          // height
-            //     0x6b4f2a     // brown colour
-            // );
-
             // using the tileset and simply changing tiles instead
             // might be out of scope but will want to implement a neighbor check
             // this will ensure that the tilled tile doesn't look out of the blue and bends in
@@ -251,8 +343,6 @@ export class FarmManager {
 
             // Darkens the soil colour to show it's wet
             if (tile.visual) {
-                // tile.visual.setFillStyle(0x4e342e);
-
                 tile.visual.tint = 0xB8C0D0; //changing the tint to make it slightly darker / wet
             }
 
@@ -266,7 +356,6 @@ export class FarmManager {
 
         // Only plant if:
         // - tile is tilled
-        // - tile is watered
         // - there is no crop already there
         if (tile.tilled && !tile.plant) {
             // Create a crop object to track its growth
@@ -274,8 +363,6 @@ export class FarmManager {
             console.log(tile.plant.tileX);
 
             this.plantsArr.push(tile.plant); // To access plants outside the function
-
-            // console.log("Planted", plantType, "at", x, y);
         }
     }
 }
