@@ -164,62 +164,73 @@ export class FarmManager {
     }
 
     updatePlantTooltip(pointer) {
-        // Don't show if UI is open
-        if (this.scene.isUIOpen) {
-            this.hideTooltip();
-            return;
-        }
-
-        // Get tile under cursor
-        const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
-        const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
-        const tileData = this.getTile(tile.x, tile.y);
-
-        // Check if there's a plant on this tile
-        if (!tileData.plant) {
-            this.hideTooltip();
-            return;
-        }
-
-        const plant = tileData.plant;
-        const plantName = plant.type.charAt(0).toUpperCase() + plant.type.slice(1); // Capitalize
-        
-        // Calculate time remaining
-        let timeText = '';
-        if (plant.harvestable) {
-            timeText = 'Ready to harvest!';
-        } else {
-            const timeLeft = plant.nextStageTimer - plant.timer;
-            const secondsLeft = Math.ceil(timeLeft / 1000);
-            timeText = `${secondsLeft}s until next stage`;
-        }
-        
-        // Stage info
-        const stageText = `Stage ${plant.stage + 1}/${plant.maxStage + 1}`;
-        
-        // Position tooltip near cursor (offset so it doesn't cover the plant)
-        const tooltipX = pointer.x + 15;
-        const tooltipY = pointer.y - 10;
-        
-        // Update tooltip content
-        this.tooltipName.setText(plantName);
-        this.tooltipStage.setText(stageText);
-        this.tooltipTime.setText(timeText);
-        
-        // Position background
-        this.tooltipBg.setPosition(tooltipX, tooltipY);
-        
-        // Position texts (stacked vertically inside the background)
-        this.tooltipName.setPosition(tooltipX + 5, tooltipY - 50);
-        this.tooltipStage.setPosition(tooltipX + 5, tooltipY - 35);
-        this.tooltipTime.setPosition(tooltipX + 5, tooltipY - 20);
-        
-        // Show tooltip
-        this.tooltipBg.setVisible(true);
-        this.tooltipName.setVisible(true);
-        this.tooltipStage.setVisible(true);
-        this.tooltipTime.setVisible(true);
+    // Don't show if UI is open
+    if (this.scene.isUIOpen) {
+        this.hideTooltip();
+        return;
     }
+
+    // Get tile under cursor
+    const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
+    const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
+    const tileData = this.getTile(tile.x, tile.y);
+
+    // Check if there's a plant on this tile
+    if (!tileData.plant) {
+        this.hideTooltip();
+        return;
+    }
+
+    const plant = tileData.plant;
+    const plantName = plant.type.charAt(0).toUpperCase() + plant.type.slice(1); // Capitalize
+    
+    // Get plant data
+    const data = plantData[plant.type];
+    
+    // Calculate time remaining
+    let timeText = '';
+    if (plant.harvestable) {
+        timeText = 'Ready to harvest!';
+    } else {
+        const timeLeft = plant.nextStageTimer - plant.currentTimer;
+        const secondsLeft = Math.ceil(timeLeft / 1000);
+        timeText = `${secondsLeft}s until next stage`;
+    }
+    
+    // Stage info
+    const stageText = `Stage ${plant.currentStage + 1}/${data.maxStage + 1}`;
+    
+    // Position tooltip near cursor (offset so it doesn't cover the plant)
+    const tooltipX = pointer.x + 15;
+    const tooltipY = pointer.y - 10;
+    
+    // Update tooltip content
+    this.tooltipName.setText(plantName);
+    this.tooltipStage.setText(stageText);
+    this.tooltipTime.setText(timeText);
+    
+    // Adjust background size based on content
+    const maxWidth = Math.max(
+        this.tooltipName.width,
+        this.tooltipStage.width,
+        this.tooltipTime.width
+    );
+    this.tooltipBg.setSize(maxWidth + 15, 65);
+    
+    // Position background
+    this.tooltipBg.setPosition(tooltipX, tooltipY);
+    
+    // Position texts (stacked vertically inside the background)
+    this.tooltipName.setPosition(tooltipX + 5, tooltipY - 55);
+    this.tooltipStage.setPosition(tooltipX + 5, tooltipY - 38);
+    this.tooltipTime.setPosition(tooltipX + 5, tooltipY - 20);
+    
+    // Show tooltip
+    this.tooltipBg.setVisible(true);
+    this.tooltipName.setVisible(true);
+    this.tooltipStage.setVisible(true);
+    this.tooltipTime.setVisible(true);
+}
 
     hideTooltip() {
         this.tooltipBg.setVisible(false);
