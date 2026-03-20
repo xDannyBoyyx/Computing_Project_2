@@ -192,13 +192,13 @@ export class FarmManager {
     if (plant.harvestable) {
         timeText = 'Ready to harvest!';
     } else {
-        const timeLeft = plant.nextStageTimer - plant.currentTimer;
+        const timeLeft = plant.nextStageTimer - plant.growthTimer; // FIXED: use growthTimer
         const secondsLeft = Math.ceil(timeLeft / 1000);
         timeText = `${secondsLeft}s until next stage`;
     }
     
-    // Stage info
-    const stageText = `Stage ${plant.currentStage + 1}/${data.maxStage + 1}`;
+    // Stage info - FIXED: currentStage starts at 1, maxStages is the final stage
+    const stageText = `Stage ${plant.currentStage}/${plant.maxStages}`;
     
     // Position tooltip near cursor (offset so it doesn't cover the plant)
     const tooltipX = pointer.x + 15;
