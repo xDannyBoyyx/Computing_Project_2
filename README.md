@@ -50,4 +50,6 @@ Gardening Tools: https://llenpix.itch.io/free-gardening-tools-assets-32x32
 
 Character Sprite: https://craftpix.net/freebies/free-base-4-direction-male-character-pixel-art/
 
-Background Music [Farm]: https://incompetech.com/music/royalty-free/music.html
+Background Music [Farm]: https://incompetech.com/music/royalty-free/music.html 
+
+Farm Assets(Merchant NPC, Animals, etc.): https://emanuelledev.itch.io/farm-rpg
