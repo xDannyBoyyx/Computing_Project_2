@@ -23,6 +23,9 @@ export class FarmManager {
         // Done so that they can be accessed outside the plant function and update for example can be called
         this.plantsArr = [];
 
+        this.tooltipActive = false;
+        this.lastTooltipTile = null;
+
         // Create tile highlight
         this.createTileHighlight();
         
@@ -164,75 +167,72 @@ export class FarmManager {
     }
 
     updatePlantTooltip(pointer) {
-    // Don't show if UI is open
-    if (this.scene.isUIOpen) {
-        this.hideTooltip();
-        return;
-    }
+        // Don't show if UI is open
+        if (this.scene.isUIOpen) {
+            this.hideTooltip();
+            return;
+        }
 
-    // Get tile under cursor
-    const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
-    const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
-    const tileData = this.getTile(tile.x, tile.y);
+        // Get tile under cursor
+        const worldPoint = pointer.positionToCamera(this.scene.cameras.main);
+        const tile = this.worldToTileXY(worldPoint.x, worldPoint.y);
+        const tileData = this.getTile(tile.x, tile.y);
 
-    // Check if there's a plant on this tile
-    if (!tileData.plant) {
-        this.hideTooltip();
-        return;
-    }
+        // Check if there's a plant on this tile
+        if (!tileData.plant) {
+            this.hideTooltip();
+            return;
+        }
 
-    const plant = tileData.plant;
-    const plantName = plant.type.charAt(0).toUpperCase() + plant.type.slice(1); // Capitalize
-    
-    // Get plant data
-    const data = plantData[plant.type];
-    
-    // Calculate time remaining
-    let timeText = '';
-    if (plant.harvestable) {
-        timeText = 'Ready to harvest!';
-    } else {
-        const timeLeft = plant.nextStageTimer - plant.growthTimer; // FIXED: use growthTimer
-        const secondsLeft = Math.ceil(timeLeft / 1000);
-        timeText = `${secondsLeft}s until next stage`;
+        // Store which tile we're hovering over
+        this.tooltipActive = true;
+        this.lastTooltipTile = { x: tile.x, y: tile.y };
+
+        const plant = tileData.plant;
+        const plantName = plant.type.charAt(0).toUpperCase() + plant.type.slice(1);
+        
+        const data = plantData[plant.type];
+        
+        let timeText = '';
+        if (plant.harvestable) {
+            timeText = 'Ready to harvest!';
+        } else {
+            const timeLeft = plant.nextStageTimer - plant.growthTimer;
+            const secondsLeft = Math.ceil(timeLeft / 1000);
+            timeText = `${secondsLeft}s until next stage`;
+        }
+        
+        const stageText = `Stage ${plant.currentStage}/${plant.maxStages}`;
+        
+        const tooltipX = pointer.x + 15;
+        const tooltipY = pointer.y - 10;
+        
+        this.tooltipName.setText(plantName);
+        this.tooltipStage.setText(stageText);
+        this.tooltipTime.setText(timeText);
+        
+        const maxWidth = Math.max(
+            this.tooltipName.width,
+            this.tooltipStage.width,
+            this.tooltipTime.width
+        );
+        this.tooltipBg.setSize(maxWidth + 15, 65);
+        
+        this.tooltipBg.setPosition(tooltipX, tooltipY);
+        
+        this.tooltipName.setPosition(tooltipX + 5, tooltipY - 55);
+        this.tooltipStage.setPosition(tooltipX + 5, tooltipY - 38);
+        this.tooltipTime.setPosition(tooltipX + 5, tooltipY - 20);
+        
+        this.tooltipBg.setVisible(true);
+        this.tooltipName.setVisible(true);
+        this.tooltipStage.setVisible(true);
+        this.tooltipTime.setVisible(true);
     }
-    
-    // Stage info - FIXED: currentStage starts at 1, maxStages is the final stage
-    const stageText = `Stage ${plant.currentStage}/${plant.maxStages}`;
-    
-    // Position tooltip near cursor (offset so it doesn't cover the plant)
-    const tooltipX = pointer.x + 15;
-    const tooltipY = pointer.y - 10;
-    
-    // Update tooltip content
-    this.tooltipName.setText(plantName);
-    this.tooltipStage.setText(stageText);
-    this.tooltipTime.setText(timeText);
-    
-    // Adjust background size based on content
-    const maxWidth = Math.max(
-        this.tooltipName.width,
-        this.tooltipStage.width,
-        this.tooltipTime.width
-    );
-    this.tooltipBg.setSize(maxWidth + 15, 65);
-    
-    // Position background
-    this.tooltipBg.setPosition(tooltipX, tooltipY);
-    
-    // Position texts (stacked vertically inside the background)
-    this.tooltipName.setPosition(tooltipX + 5, tooltipY - 55);
-    this.tooltipStage.setPosition(tooltipX + 5, tooltipY - 38);
-    this.tooltipTime.setPosition(tooltipX + 5, tooltipY - 20);
-    
-    // Show tooltip
-    this.tooltipBg.setVisible(true);
-    this.tooltipName.setVisible(true);
-    this.tooltipStage.setVisible(true);
-    this.tooltipTime.setVisible(true);
-}
 
     hideTooltip() {
+        this.tooltipActive = false;
+        this.lastTooltipTile = null;
         this.tooltipBg.setVisible(false);
         this.tooltipName.setVisible(false);
         this.tooltipStage.setVisible(false);
@@ -250,6 +250,30 @@ export class FarmManager {
         for (var p of this.plantsArr){
             if (this.getTile(p.tileX, p.tileY).watered){
                 p.update(time,delta);
+            }
+        }
+
+        // UPDATE TOOLTIP TEXT CONTINUOUSLY IF ACTIVE
+        if (this.tooltipActive && this.lastTooltipTile) {
+            const tileData = this.getTile(this.lastTooltipTile.x, this.lastTooltipTile.y);
+            
+            if (tileData.plant) {
+                const plant = tileData.plant;
+                
+                let timeText = '';
+                if (plant.harvestable) {
+                    timeText = 'Ready to harvest!';
+                } else {
+                    const timeLeft = plant.nextStageTimer - plant.growthTimer;
+                    const secondsLeft = Math.ceil(timeLeft / 1000);
+                    timeText = `${secondsLeft}s until next stage`;
+                }
+                
+                const stageText = `Stage ${plant.currentStage}/${plant.maxStages}`;
+                
+                // Update only the text, not position
+                this.tooltipStage.setText(stageText);
+                this.tooltipTime.setText(timeText);
             }
         }
     }
