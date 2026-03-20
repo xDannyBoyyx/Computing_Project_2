@@ -292,6 +292,7 @@ export class FarmManager {
         const tile = this.getTile(x, y);
         const hotbar = this.scene.hotbar;
         const tool = hotbar.getSelectedTool();
+        
 
         // Gets the tool type 
         const toolType = tool?.type ?? null;
@@ -313,10 +314,73 @@ export class FarmManager {
         else if (toolType === 'WateringCan' && tile.tilled) {
             this.water(x, y);
         }
+        else if (toolType === 'Scythe' && tile.plant && tile.plant.harvestable) {
+        this.tryHarvest(this.scene.player);
+        }
+
         else {
             console.log("Harvest not implemented yet");
         }
     }
+
+  
+  tryHarvest(player) {
+    const hotbar = this.scene.hotbar;
+    const selectedTool = hotbar.getSelectedTool();
+
+    // Only harvest if player has the correct tool
+    if (!selectedTool || !['Scythe'].includes(selectedTool.type)) return;
+
+    this.plantsArr.forEach(plant => {
+        const dist = Phaser.Math.Distance.Between(
+            player.sprite.x, player.sprite.y,
+            plant.sprite.x, plant.sprite.y
+        );
+
+        if (dist < 64 && plant.harvestable) {
+            const inventory = this.scene.inventory;
+            const emptyIndex = inventory.items.findIndex(i => !i);
+            if (emptyIndex === -1) return; // inventory full
+
+            const slot = inventory.slots[emptyIndex];
+            const plantInfo = plantData[plant.type];
+
+            
+            const finalFrame = plant.currentFrame;
+
+            const itemSprite = this.scene.add.sprite(slot.x, slot.y, plantInfo.spriteSheet, finalFrame)
+                .setDisplaySize(21, 21)
+                .setInteractive(new Phaser.Geom.Rectangle(-21, -21, 60, 60), Phaser.Geom.Rectangle.Contains);
+
+            // Make draggable 
+            this.scene.input.setDraggable(itemSprite);
+            itemSprite.source = 'inventory';
+            itemSprite.slotIndex = emptyIndex;
+            itemSprite.harvestedFrame = finalFrame; 
+            inventory.container.add(itemSprite);
+
+            inventory.items[emptyIndex] = {
+                type: plant.type,
+                sprite: itemSprite,
+                frame: finalFrame,
+                harvestedFrame: finalFrame,
+                price: plantInfo.sellValue,
+                displaySize: 21,
+                source: 'inventory',
+                slotIndex: emptyIndex
+            };
+
+            // Reset plant to plucked stage
+            plant.currentStage = 1;
+            plant.currentFrame = plant.startFrame;
+            plant.fullyGrown = false;
+            plant.harvestable = false;
+
+            plant.sprite.setTexture(plant.spriteSheet, plant.startFrame);
+            plant.growthTimer = 0;
+        }
+    });
+}
 
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily

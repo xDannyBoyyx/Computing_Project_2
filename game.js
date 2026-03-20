@@ -9,6 +9,7 @@ import { EconomyManager } from './economyManager.js';
 
 import { Player } from './player.js';
 import { Merchant } from './merchant.js';
+import { MerchantNPC } from './merchant_npc.js';
 
 class GameScene extends Phaser.Scene {
   constructor() {
@@ -52,6 +53,17 @@ class GameScene extends Phaser.Scene {
       frameHeight: 40
     });
     this.load.audio("farmMusic", "assets/Magic Scout - Farm.mp3");
+
+    // Merchant animations
+    this.load.spritesheet('Merchant_Idle', 'assets/Merchant_Idle.png', {
+      frameWidth: 28, 
+      frameHeight:28,
+    });
+
+    this.load.spritesheet('Merchant_Walk', 'assets/Merchant_Walk.png', {
+      frameWidth: 64, 
+      frameHeight: 64,
+    });
   }
   
   create(data) { // ADD 'data' parameter to receive gender from menu
@@ -63,12 +75,17 @@ class GameScene extends Phaser.Scene {
     // the number argument = gold, so change it to whatever you want 
     this.economy = new EconomyManager(this, 100); 
     this.merchant = new Merchant(this);
+    this.merchant.initUI();
+    
     this.worldManager = new WorldManager(this);
     this.worldManager.createUI();
      
     // Get selected gender from main menu (defaults to 'male' if not provided)
     const selectedGender = data.gender || 'male';
     const spriteKey = selectedGender === 'male' ? 'player' : 'playerFemale';
+
+    // Harvesting 
+    this.harvestKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     
     this.anims.create({
       key: 'move-down',
@@ -97,8 +114,12 @@ class GameScene extends Phaser.Scene {
       frameRate: 10,
       repeat: -1
     });
+
+    
     
     this.player = new Player(this, 320, 100, selectedGender); // Pass gender to player
+  
+    this.merchantNPC = new MerchantNPC(this, 100, 100, this.player, this.merchant); // change the number arguments if you want to move the merchant (100, left, 300, bottom)
     this.cameras.main.startFollow(this.player.sprite, true);
     this.cameras.main.setBounds(0, 0, 40 * 16, 25 * 16);
     this.physics.world.setBounds(0, 0, 40 * 16, 25 * 16);
@@ -114,22 +135,23 @@ class GameScene extends Phaser.Scene {
     });
 
     this.backgroundMusic.play();
+    
   }
   
   update(time, delta) {
-    // Stops gameplay if inv is open
-    if (this.isUIOpen) {
-      return;
-    }
- 
-    if(this.player) {
-      this.player.update();
+    if (!this.isUIOpen) {
+        this.player.update();
+        this.farmManager.update(this.player, time, delta);
+
+        if (Phaser.Input.Keyboard.JustDown(this.harvestKey)) {
+            this.farmManager.tryHarvest(this.player);
+        }
     }
 
-    this.farmManager.update(this.player, time, delta);
+    this.worldManager.update(time, delta);
     this.merchant.update(time, delta);
-    this.worldManager.update(time,delta);
-  }
+    this.merchantNPC.update(); 
+}
 }
 
 const config = {
@@ -149,7 +171,7 @@ const config = {
   },
   audio: {               
     disableWebAudio: false, // this makes it so the music still plays when on another tab
-    noAudio: false
+    noAudio: true
   },
   scene: [MainMenu,GameScene,SettingsMenu] //Switch MainMenu & GameScene if you don't want to see the main menu every time.
 };

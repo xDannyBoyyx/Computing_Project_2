@@ -2,18 +2,23 @@ export class Merchant {
     constructor(scene) {
         this.scene = scene;
         // The main reason the hitboxes were all over the place was because I didn't have a static camera
-        this.uiCamera = this.scene.cameras.add(0, 0, this.scene.scale.width, this.scene.scale.height);
-        this.uiCamera.setScroll(0, 0);
+       
         this.isOpen = false;
 
         this.container = this.scene.add.container(0, 0)
         .setDepth(1000)
         .setVisible(false);
 
-        this.scene.cameras.main.ignore(this.container);
+    }
 
-        this.uiCamera = this.scene.cameras.add(0, 0, this.scene.scale.width, this.scene.scale.height);
-        this.uiCamera.setScroll(0, 0);
+        initUI() {
+        this.uiCamera = this.scene.cameras.add(
+            0, 0,
+            this.scene.scale.width,
+            this.scene.scale.height
+        );
+
+        this.scene.cameras.main.ignore(this.container);
 
         // Items merchant sells (if you want to add to this, add the image under the preload function in game.js then come back here to format it)
         this.itemsForSale = [
@@ -141,43 +146,53 @@ export class Merchant {
     }
 
     getCurrentItems() {
-        if (this.currentMode === 'buy') return this.itemsForSale;
+    if (this.currentMode === 'buy') return this.itemsForSale;
 
-        if (this.currentMode === 'sell') {
-            let sellableItems = [];
+    if (this.currentMode === 'sell') {
+        let sellableItems = [];
 
-            // Add inv items
-            if (this.scene.inventory) {
-                sellableItems.push(...this.scene.inventory.items
-                .map((invItem, i) => invItem ? {
+        // Add items from inventory
+        if (this.scene.inventory) {
+            sellableItems.push(...this.scene.inventory.items
+            .map((invItem, i) => {
+                if (!invItem) return null;
+
+                // Use the actual sprite from inventory, preserving frame if spritesheet
+                const spriteKey = invItem.sprite.texture.key;
+                const frame = invItem.sprite.frame ? invItem.sprite.frame.name : null;
+
+                return {
                     type: invItem.type,
                     sprite: invItem.sprite,
+                    frame: frame,          // for spritesheet crops
                     slotIndex: i,
                     source: 'inventory',
                     price: Math.floor(invItem.price / 2) || 10,
-                    displaySize: 21
-                } : null)
-                .filter(i => i));
-            }
-
-            // Add hotbar items
-            if (this.scene.hotbar) {
-                this.scene.hotbar.tools.forEach((tool, i) => {
-                    if (!tool) return;
-                    sellableItems.push({
-                        type: tool.type,
-                        sprite: tool.sprite,
-                        slotIndex: i,
-                        source: 'hotbar',
-                        price: Math.floor(this.itemsForSale.find(x => x.key === tool.type)?.price / 2) || 10,
-                        displaySize: 20
-                    });
-                });
-            }
-
-            return sellableItems;
+                    displaySize: invItem.displaySize || 21
+                };
+            }).filter(i => i));
         }
+
+        // Add hotbar items
+        if (this.scene.hotbar) {
+            this.scene.hotbar.tools.forEach((tool, i) => {
+                if (!tool) return;
+
+                sellableItems.push({
+                    type: tool.type,
+                    sprite: tool.sprite,
+                    slotIndex: i,
+                    source: 'hotbar',
+                    price: Math.floor(this.itemsForSale.find(x => x.key === tool.type)?.price / 2) || 10,
+                    displaySize: tool.sprite.displayWidth || 20,
+                    frame: tool.sprite.frame ? tool.sprite.frame.name : null
+                });
+            });
+        }
+
+        return sellableItems;
     }
+}
 
    refreshItems() {
         // Destroy previous items
@@ -198,32 +213,43 @@ export class Merchant {
         const slotSize = 55; 
 
         pageItems.forEach((item, i) => {
-            const row = Math.floor(i / 5);
-            const col = i % 5;
-            const x = startX + col * slotSpacingX;
-            const y = startY + row * slotSpacingY;
+        const row = Math.floor(i / 5);
+        const col = i % 5;
+        const x = startX + col * slotSpacingX;
+        const y = startY + row * slotSpacingY;
 
-            const slot = this.scene.add.rectangle(x, y, slotSize, slotSize, 0x444444)
-                .setStrokeStyle(2, 0xffffff)
-                .setInteractive();
-            this.container.add(slot);
+        const slot = this.scene.add.rectangle(x, y, slotSize, slotSize, 0x444444)
+            .setStrokeStyle(2, 0xffffff)
+            .setInteractive();
+        this.container.add(slot);
 
-            const sprite = this.scene.add.image(x, y, item.type || item.key)
+        
+        let sprite;
+        if (item.sprite && item.frame !== null) {
+            // Item comes from inv or hotbar crop: uses same spritesheet and frame
+            sprite = this.scene.add.sprite(x, y, item.sprite.texture.key, item.frame)
                 .setDisplaySize(item.displaySize, item.displaySize);
-            this.container.add(sprite);
+        } else {
+            
+            sprite = this.scene.add.image(x, y, item.type || item.key)
+                .setDisplaySize(item.displaySize, item.displaySize);
+        }
+        this.container.add(sprite);
+       
 
-            const priceText = this.scene.add.text(x, y + 28, `💰${item.price}`, {
-                fontSize: '14px', color: '#FFD700', fontStyle: 'bold'
-            }).setOrigin(0.5, 0);
-            this.container.add(priceText);
+        const priceText = this.scene.add.text(x, y + 28, `💰${item.price}`, {
+            fontSize: '14px', color: '#FFD700', fontStyle: 'bold'
+        }).setOrigin(0.5, 0);
 
-            this.itemSlots.push({ slot, sprite, priceText, item });
+        this.container.add(priceText);
 
-            slot.on('pointerdown', () => {
-                if (this.currentMode === 'buy') this.buyItem(item);
-                else this.sellItem(item);
-            });
+        this.itemSlots.push({ slot, sprite, priceText, item });
+
+        slot.on('pointerdown', () => {
+            if (this.currentMode === 'buy') this.buyItem(item);
+            else this.sellItem(item);
         });
+    });
     }
 
     buyItem(item) {
