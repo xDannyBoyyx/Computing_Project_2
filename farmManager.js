@@ -198,7 +198,7 @@ export class FarmManager {
     }
     
     // Stage info - FIXED: currentStage starts at 1, maxStages is the final stage
-    const stageText = `Stage ${plant.currentStage}/${plant.maxStages}`;
+    const stageText = `Stage ${plant.currentStage}/${plant.maxStages + 1}`;
     
     // Position tooltip near cursor (offset so it doesn't cover the plant)
     const tooltipX = pointer.x + 15;
