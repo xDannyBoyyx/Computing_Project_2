@@ -323,65 +323,81 @@ export class FarmManager {
         }
     }
 
-  
-  tryHarvest(player) {
+    tryHarvest(player) {
     const hotbar = this.scene.hotbar;
     const selectedTool = hotbar.getSelectedTool();
 
-    // Only harvest if player has the correct tool
-    if (!selectedTool || !['Scythe'].includes(selectedTool.type)) return;
+    // Only harvest if the player has the Scythe
+    if (!selectedTool || selectedTool.type !== 'Scythe') return;
 
-    this.plantsArr.forEach(plant => {
+    // Find only one harvestable plant within range
+    let targetPlant = null;
+    for (let plant of this.plantsArr) {
         const dist = Phaser.Math.Distance.Between(
             player.sprite.x, player.sprite.y,
             plant.sprite.x, plant.sprite.y
         );
 
         if (dist < 64 && plant.harvestable) {
-            const inventory = this.scene.inventory;
-            const emptyIndex = inventory.items.findIndex(i => !i);
-            if (emptyIndex === -1) return; // inventory full
-
-            const slot = inventory.slots[emptyIndex];
-            const plantInfo = plantData[plant.type];
-
-            
-            const finalFrame = plant.currentFrame;
-
-            const itemSprite = this.scene.add.sprite(slot.x, slot.y, plantInfo.spriteSheet, finalFrame)
-                .setDisplaySize(21, 21)
-                .setInteractive(new Phaser.Geom.Rectangle(-21, -21, 60, 60), Phaser.Geom.Rectangle.Contains);
-
-            // Make draggable 
-            this.scene.input.setDraggable(itemSprite);
-            itemSprite.source = 'inventory';
-            itemSprite.slotIndex = emptyIndex;
-            itemSprite.harvestedFrame = finalFrame; 
-            inventory.container.add(itemSprite);
-
-            inventory.items[emptyIndex] = {
-                type: plant.type,
-                sprite: itemSprite,
-                frame: finalFrame,
-                harvestedFrame: finalFrame,
-                price: plantInfo.sellValue,
-                displaySize: 21,
-                source: 'inventory',
-                slotIndex: emptyIndex
-            };
-
-            // Reset plant to plucked stage
-            plant.currentStage = 1;
-            plant.currentFrame = plant.startFrame;
-            plant.fullyGrown = false;
-            plant.harvestable = false;
-
-            plant.sprite.setTexture(plant.spriteSheet, plant.startFrame);
-            plant.growthTimer = 0;
+            targetPlant = plant;
+            break; 
         }
-    });
-}
+    }
 
+    if (!targetPlant) return;
+
+    // Add harvested plant to inventory
+    const inventory = this.scene.inventory;
+    const emptyIndex = inventory.items.findIndex(i => !i);
+    if (emptyIndex === -1) return; //  if inv is full
+
+    const slot = inventory.slots[emptyIndex];
+    const plantInfo = plantData[targetPlant.type];
+
+    const itemSprite = this.scene.add.sprite(slot.x, slot.y, plantInfo.spriteSheet, targetPlant.currentFrame)
+        .setDisplaySize(21, 21)
+        .setInteractive(new Phaser.Geom.Rectangle(-21, -21, 60, 60), Phaser.Geom.Rectangle.Contains);
+
+    this.scene.input.setDraggable(itemSprite);
+    itemSprite.source = 'inventory';
+    itemSprite.slotIndex = emptyIndex;
+    itemSprite.harvestedFrame = targetPlant.currentFrame;
+
+    inventory.container.add(itemSprite);
+
+    inventory.items[emptyIndex] = {
+        type: targetPlant.type,
+        sprite: itemSprite,
+        frame: targetPlant.currentFrame,
+        harvestedFrame: targetPlant.currentFrame,
+        price: plantInfo.sellValue,
+        displaySize: 21,
+        source: 'inventory',
+        slotIndex: emptyIndex
+    };
+
+    // Remove the plant
+    targetPlant.sprite.destroy();
+    this.plantsArr = this.plantsArr.filter(p => p !== targetPlant);
+
+    const tileData = this.getTile(targetPlant.tileX, targetPlant.tileY);
+
+    if (tileData) {
+        tileData.plant = null;
+        tileData.watered = false;
+
+        // Replace tile with dry tilled soil
+        this.map.putTileAt(77, targetPlant.tileX, targetPlant.tileY);
+
+        // Get the new tile reference
+        tileData.visual = this.map.getTileAt(targetPlant.tileX, targetPlant.tileY);
+
+        // Clears the tint so it looks dry again
+        if (tileData.visual) {
+            tileData.visual.tint = 0xffffff; 
+        }
+    }
+}
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily
     getKey(x, y) {
