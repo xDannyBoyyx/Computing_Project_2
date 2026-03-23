@@ -71,14 +71,13 @@ class GameScene extends Phaser.Scene {
     const tileset = map.addTilesetImage('grass', 'grassTiles');
     const ground = map.createLayer('Background', tileset, 0, 0); 
    
-    this.farmManager = new FarmManager(this, map);
+    this.worldManager = new WorldManager(this);
+    this.worldManager.createUI();
+    this.farmManager = new FarmManager(this, map, this.worldManager);
     // the number argument = gold, so change it to whatever you want 
     this.economy = new EconomyManager(this, 100); 
     this.merchant = new Merchant(this);
     this.merchant.initUI();
-    
-    this.worldManager = new WorldManager(this);
-    this.worldManager.createUI();
      
     // Get selected gender from main menu (defaults to 'male' if not provided)
     const selectedGender = data.gender || 'male';
@@ -115,8 +114,6 @@ class GameScene extends Phaser.Scene {
       repeat: -1
     });
 
-    
-    
     this.player = new Player(this, 320, 100, selectedGender); // Pass gender to player
   
     this.merchantNPC = new MerchantNPC(this, 100, 100, this.player, this.merchant); // change the number arguments if you want to move the merchant (100, left, 300, bottom)
@@ -135,7 +132,6 @@ class GameScene extends Phaser.Scene {
     });
 
     this.backgroundMusic.play();
-    
   }
   
   update(time, delta) {

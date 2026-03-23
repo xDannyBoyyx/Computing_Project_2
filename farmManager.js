@@ -9,9 +9,11 @@ const pouchToPlant = {
 };
 
 export class FarmManager {
-    constructor(scene, map) {
+    constructor(scene, map, worldManager) {
         this.scene = scene;   
         this.map = map;    
+        this.worldManager = worldManager;
+        // console.log(this.worldManager);
 
         this.tileSize = 16;   // each tile is 16x16 pixels
 
@@ -239,45 +241,6 @@ export class FarmManager {
         this.tooltipTime.setVisible(false);
     }
 
-    // can now call this inside game.js
-    update(player, time, delta) {
-        if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
-            const tile = this.worldToTileXY(player.sprite.x, player.sprite.y);
-            this.handleFarmAction(tile.x, tile.y, "primary");
-        }
-
-        // For each plant inside the plant array, update them to ensure they can grow after being watered
-        for (var p of this.plantsArr){
-            if (this.getTile(p.tileX, p.tileY).watered){
-                p.update(time,delta);
-            }
-        }
-
-        // UPDATE TOOLTIP TEXT CONTINUOUSLY IF ACTIVE
-        if (this.tooltipActive && this.lastTooltipTile) {
-            const tileData = this.getTile(this.lastTooltipTile.x, this.lastTooltipTile.y);
-            
-            if (tileData.plant) {
-                const plant = tileData.plant;
-                
-                let timeText = '';
-                if (plant.harvestable) {
-                    timeText = 'Ready to harvest!';
-                } else {
-                    const timeLeft = plant.nextStageTimer - plant.growthTimer;
-                    const secondsLeft = Math.ceil(timeLeft / 1000);
-                    timeText = `${secondsLeft}s until next stage`;
-                }
-                
-                const stageText = `Stage ${plant.currentStage}/${plant.maxStages}`;
-                
-                // Update only the text, not position
-                this.tooltipStage.setText(stageText);
-                this.tooltipTime.setText(timeText);
-            }
-        }
-    }
-
     worldToTileXY(worldX, worldY) {
         return {
             x: Math.floor(worldX / this.tileSize),
@@ -285,7 +248,7 @@ export class FarmManager {
         };
     }
 
-    // --- Farming logic ---
+    // Farming logic
     handleFarmAction(x, y) {
         if (this.scene.isUIOpen) return;
 
@@ -324,80 +287,83 @@ export class FarmManager {
     }
 
     tryHarvest(player) {
-    const hotbar = this.scene.hotbar;
-    const selectedTool = hotbar.getSelectedTool();
+        const hotbar = this.scene.hotbar;
+        const selectedTool = hotbar.getSelectedTool();
 
-    // Only harvest if the player has the Scythe
-    if (!selectedTool || selectedTool.type !== 'Scythe') return;
+        // Only harvest if the player has the Scythe
+        if (!selectedTool || selectedTool.type !== 'Scythe') return;
 
-    // Find only one harvestable plant within range
-    let targetPlant = null;
-    for (let plant of this.plantsArr) {
-        const dist = Phaser.Math.Distance.Between(
-            player.sprite.x, player.sprite.y,
-            plant.sprite.x, plant.sprite.y
-        );
+        // Find only one harvestable plant within range
+        let targetPlant = null;
+        for (let plant of this.plantsArr) {
+            const dist = Phaser.Math.Distance.Between(
+                player.sprite.x, player.sprite.y,
+                plant.sprite.x, plant.sprite.y
+            );
 
-        if (dist < 64 && plant.harvestable) {
-            targetPlant = plant;
-            break; 
+            if (dist < 64 && plant.harvestable) {
+                targetPlant = plant;
+                break; 
+            }
+        }
+
+        if (!targetPlant) return;
+
+        // Add harvested plant to inventory
+        const inventory = this.scene.inventory;
+        const emptyIndex = inventory.items.findIndex(i => !i);
+
+        if (emptyIndex === -1) return; //  if inv is full
+
+        const slot = inventory.slots[emptyIndex];
+        const plantInfo = plantData[targetPlant.type];
+
+        const itemSprite = this.scene.add.sprite(slot.x, slot.y, plantInfo.spriteSheet, targetPlant.currentFrame)
+            .setDisplaySize(21, 21)
+            .setInteractive(new Phaser.Geom.Rectangle(-21, -21, 60, 60), Phaser.Geom.Rectangle.Contains);
+
+        this.scene.input.setDraggable(itemSprite);
+        itemSprite.source = 'inventory';
+        itemSprite.slotIndex = emptyIndex;
+        itemSprite.harvestedFrame = targetPlant.currentFrame;
+
+        inventory.container.add(itemSprite);
+
+        inventory.items[emptyIndex] = {
+            type: targetPlant.type,
+            sprite: itemSprite,
+            frame: targetPlant.currentFrame,
+            harvestedFrame: targetPlant.currentFrame,
+            price: plantInfo.sellValue,
+            displaySize: 21,
+            source: 'inventory',
+            slotIndex: emptyIndex
+        };
+
+        // Remove the plant
+        targetPlant.sprite.destroy();
+        this.plantsArr = this.plantsArr.filter(p => p !== targetPlant);
+
+        const tileData = this.getTile(targetPlant.tileX, targetPlant.tileY);
+
+        if (tileData) {
+            tileData.plant = null;
+            tileData.watered = false;
+
+            // Replace tile with dry tilled soil
+            this.map.putTileAt(77, targetPlant.tileX, targetPlant.tileY);
+
+            // Get the new tile reference
+            tileData.visual = this.map.getTileAt(targetPlant.tileX, targetPlant.tileY);
+
+            // Clears the tint so it looks dry again
+            if (tileData.visual) {
+                tileData.visual.tint = 0xffffff; 
+            }
         }
     }
 
-    if (!targetPlant) return;
 
-    // Add harvested plant to inventory
-    const inventory = this.scene.inventory;
-    const emptyIndex = inventory.items.findIndex(i => !i);
-    if (emptyIndex === -1) return; //  if inv is full
-
-    const slot = inventory.slots[emptyIndex];
-    const plantInfo = plantData[targetPlant.type];
-
-    const itemSprite = this.scene.add.sprite(slot.x, slot.y, plantInfo.spriteSheet, targetPlant.currentFrame)
-        .setDisplaySize(21, 21)
-        .setInteractive(new Phaser.Geom.Rectangle(-21, -21, 60, 60), Phaser.Geom.Rectangle.Contains);
-
-    this.scene.input.setDraggable(itemSprite);
-    itemSprite.source = 'inventory';
-    itemSprite.slotIndex = emptyIndex;
-    itemSprite.harvestedFrame = targetPlant.currentFrame;
-
-    inventory.container.add(itemSprite);
-
-    inventory.items[emptyIndex] = {
-        type: targetPlant.type,
-        sprite: itemSprite,
-        frame: targetPlant.currentFrame,
-        harvestedFrame: targetPlant.currentFrame,
-        price: plantInfo.sellValue,
-        displaySize: 21,
-        source: 'inventory',
-        slotIndex: emptyIndex
-    };
-
-    // Remove the plant
-    targetPlant.sprite.destroy();
-    this.plantsArr = this.plantsArr.filter(p => p !== targetPlant);
-
-    const tileData = this.getTile(targetPlant.tileX, targetPlant.tileY);
-
-    if (tileData) {
-        tileData.plant = null;
-        tileData.watered = false;
-
-        // Replace tile with dry tilled soil
-        this.map.putTileAt(77, targetPlant.tileX, targetPlant.tileY);
-
-        // Get the new tile reference
-        tileData.visual = this.map.getTileAt(targetPlant.tileX, targetPlant.tileY);
-
-        // Clears the tint so it looks dry again
-        if (tileData.visual) {
-            tileData.visual.tint = 0xffffff; 
-        }
-    }
-}
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily
     getKey(x, y) {
@@ -474,18 +440,49 @@ export class FarmManager {
         // - there is no crop already there
         if (tile.tilled && !tile.plant) {
             // Create a crop object to track its growth
-            tile.plant = new Plant(this.scene, x, y, plantType);
+            tile.plant = new Plant(this.scene, x, y, plantType, this.worldManager);
             console.log(tile.plant.tileX);
 
             this.plantsArr.push(tile.plant); // To access plants outside the function
         }
     }
+
+    // can now call this inside game.js
+    update(player, time, delta) {
+        if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+            const tile = this.worldToTileXY(player.sprite.x, player.sprite.y);
+            this.handleFarmAction(tile.x, tile.y, "primary");
+        }
+
+        // For each plant inside the plant array, update them to ensure they can grow after being watered
+        for (var p of this.plantsArr){
+            if (this.getTile(p.tileX, p.tileY).watered){
+                p.update(time,delta);
+            }
+        }
+
+        // UPDATE TOOLTIP TEXT CONTINUOUSLY IF ACTIVE
+        if (this.tooltipActive && this.lastTooltipTile) {
+            const tileData = this.getTile(this.lastTooltipTile.x, this.lastTooltipTile.y);
+            
+            if (tileData.plant) {
+                const plant = tileData.plant;
+                
+                let timeText = '';
+                if (plant.harvestable) {
+                    timeText = 'Ready to harvest!';
+                } else {
+                    const timeLeft = plant.nextStageTimer - plant.growthTimer;
+                    const secondsLeft = Math.ceil(timeLeft / 1000);
+                    timeText = `${secondsLeft}s until next stage`;
+                }
+                
+                const stageText = `Stage ${plant.currentStage}/${plant.maxStages}`;
+                
+                // Update only the text, not position
+                this.tooltipStage.setText(stageText);
+                this.tooltipTime.setText(timeText);
+            }
+        }
+    }
 }
-
-
-
-
-
-
-
-

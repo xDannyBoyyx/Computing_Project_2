@@ -17,7 +17,6 @@ export class SettingsMenu extends Phaser.Scene {
         const blurEffect = camera.postFX.addBlur(3, 2, 2, 1, 0xffffff, 6); // quality, x, y, strength, color, steps
 
 
-
         // startButton.setInteractive({ useHandCursor: true });
         // startButton.on('pointerdown', () => {
         //     this.scene.start('GameScene');
