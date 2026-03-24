@@ -13,6 +13,7 @@ export class FarmManager {
         this.scene = scene;   
         this.map = map;    
         this.worldManager = worldManager;
+        console.log(this.worldManager.currentWeather);
         // console.log(this.worldManager);
 
         this.tileSize = 16;   // each tile is 16x16 pixels
@@ -37,6 +38,8 @@ export class FarmManager {
         // Sets up keyboard and mouse interaction
         this.setupInput();
     }
+
+    // ----------------------------------------------------------- UI ---------------------------------------------------------------------------
 
     createTileHighlight() {
         // Create a rectangle that highlights the tile under cursor
@@ -222,9 +225,9 @@ export class FarmManager {
         
         this.tooltipBg.setPosition(tooltipX, tooltipY);
         
-        this.tooltipName.setPosition(tooltipX + 5, tooltipY - 55);
-        this.tooltipStage.setPosition(tooltipX + 5, tooltipY - 38);
-        this.tooltipTime.setPosition(tooltipX + 5, tooltipY - 20);
+        this.tooltipName.setPosition(tooltipX + 5, tooltipY - 45);
+        this.tooltipStage.setPosition(tooltipX + 5, tooltipY - 28);
+        this.tooltipTime.setPosition(tooltipX + 5, tooltipY - 10);
         
         this.tooltipBg.setVisible(true);
         this.tooltipName.setVisible(true);
@@ -240,6 +243,8 @@ export class FarmManager {
         this.tooltipStage.setVisible(false);
         this.tooltipTime.setVisible(false);
     }
+
+    // ----------------------------------------------------------- UI ---------------------------------------------------------------------------
 
     worldToTileXY(worldX, worldY) {
         return {
@@ -278,7 +283,7 @@ export class FarmManager {
             this.water(x, y);
         }
         else if (toolType === 'Scythe' && tile.plant && tile.plant.harvestable) {
-        this.tryHarvest(this.scene.player);
+            this.tryHarvest(this.scene.player);
         }
 
         else {
@@ -286,6 +291,7 @@ export class FarmManager {
         }
     }
 
+    // change so it shows last part of spritesheet.
     tryHarvest(player) {
         const hotbar = this.scene.hotbar;
         const selectedTool = hotbar.getSelectedTool();
@@ -340,6 +346,9 @@ export class FarmManager {
             slotIndex: emptyIndex
         };
 
+        // Spoke about this already but i reckon it shouldn't completely remove the plant when harvesting as then it can just grow again
+        // Should only remove the plant if the user decides to use the Hoe for example on it again. -D
+
         // Remove the plant
         targetPlant.sprite.destroy();
         this.plantsArr = this.plantsArr.filter(p => p !== targetPlant);
@@ -362,7 +371,6 @@ export class FarmManager {
             }
         }
     }
-
 
     // Convert x + y into a unique string key like "2,4"
     // This lets us store tile data in the object easily
@@ -420,14 +428,15 @@ export class FarmManager {
         // Can only water tilled soil
         if (tile.tilled) {
             tile.watered = true;
-            console.log(tile);
 
             // Darkens the soil colour to show it's wet
             if (tile.visual) {
-                tile.visual.tint = 0xB8C0D0; //changing the tint to make it slightly darker / wet
+                tile.visual.tint = 0xB8C0D0; // Changing the tint to make it slightly darker / wet
+            } else {
+                tile.visual.tint = 0xffffff; // Reseting it back to normal look
             }
 
-            console.log("Watered:", x, y);
+            console.log(`Watered soil at ${x} & ${y}`); // Just ensuring its watered the right tile
         }
     }
 
@@ -439,15 +448,13 @@ export class FarmManager {
         // - tile is tilled
         // - there is no crop already there
         if (tile.tilled && !tile.plant) {
-            // Create a crop object to track its growth
-            tile.plant = new Plant(this.scene, x, y, plantType, this.worldManager);
-            console.log(tile.plant.tileX);
-
+            tile.plant = new Plant(this.scene, x, y, plantType, this.worldManager); // Creating a new plant
+            console.log(`Planted ${plantType} at ${x} & ${y}`); // Checking where its been planted
             this.plantsArr.push(tile.plant); // To access plants outside the function
         }
     }
+    
 
-    // can now call this inside game.js
     update(player, time, delta) {
         if (Phaser.Input.Keyboard.JustDown(this.interactKey)) {
             const tile = this.worldToTileXY(player.sprite.x, player.sprite.y);
