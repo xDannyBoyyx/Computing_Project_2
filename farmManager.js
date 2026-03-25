@@ -7,7 +7,8 @@ const pouchToPlant = {
     'raddishPouch': 'raddish',
     'cabbagePouch': 'cabbage',
     'grapePouch': 'grape',
-    'chilliPouch': 'chilli'
+    'chilliPouch': 'chilli',
+    'cucumberPouch': 'cucumber'
 };
 
 export class FarmManager {
