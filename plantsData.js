@@ -36,5 +36,14 @@ export const plantData = {
         harvestMax: 4,
         spriteSheet: "mediumPlant", 
         startFrame: 20 
+    },
+    "grape": {
+        nextStageTimer: 4500,
+        maxStage: 3,
+        sellValue: 6,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "largePlant", 
+        startFrame: 12
     }
 }
