@@ -13,8 +13,6 @@ export class FarmManager {
         this.scene = scene;   
         this.map = map;    
         this.worldManager = worldManager;
-        console.log(this.worldManager.currentWeather);
-        // console.log(this.worldManager);
 
         this.tileSize = 16;   // each tile is 16x16 pixels
 
@@ -46,7 +44,7 @@ export class FarmManager {
         this.tileHighlight = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize)
             .setStrokeStyle(2, 0xffffff, 0.8)
             .setFillStyle(0xffffff, 0.2)
-            .setDepth(1000)
+            .setDepth(100)
             .setScrollFactor(1, 1)
             .setVisible(false);
     }
@@ -55,7 +53,7 @@ export class FarmManager {
         // Background panel
         this.tooltipBg = this.scene.add.rectangle(0, 0, 150, 60, 0x000000, 0.8)
             .setOrigin(0, 1)
-            .setDepth(2000)
+            .setDepth(900)
             .setScrollFactor(0)
             .setVisible(false);
         
@@ -66,7 +64,7 @@ export class FarmManager {
             fontStyle: 'bold'
         })
             .setOrigin(0, 1)
-            .setDepth(2001)
+            .setDepth(901)
             .setScrollFactor(0)
             .setVisible(false);
         
@@ -76,7 +74,7 @@ export class FarmManager {
             color: '#aaaaaa'
         })
             .setOrigin(0, 1)
-            .setDepth(2001)
+            .setDepth(902)
             .setScrollFactor(0)
             .setVisible(false);
         
@@ -86,7 +84,7 @@ export class FarmManager {
             color: '#ffff00'
         })
             .setOrigin(0, 1)
-            .setDepth(2001)
+            .setDepth(902)
             .setScrollFactor(0)
             .setVisible(false);
     }
@@ -221,7 +219,7 @@ export class FarmManager {
             this.tooltipStage.width,
             this.tooltipTime.width
         );
-        this.tooltipBg.setSize(maxWidth + 15, 65);
+        this.tooltipBg.setSize(maxWidth + 35, 65);
         
         this.tooltipBg.setPosition(tooltipX, tooltipY);
         
@@ -479,7 +477,7 @@ export class FarmManager {
                 if (plant.harvestable) {
                     timeText = 'Ready to harvest!';
                 } else {
-                    const timeLeft = plant.nextStageTimer - plant.growthTimer;
+                    const timeLeft = plant.nextStageTimer - plant.growthTimer * this.worldManager.growthModifier;
                     const secondsLeft = Math.ceil(timeLeft / 1000);
                     timeText = `${secondsLeft}s until next stage`;
                 }

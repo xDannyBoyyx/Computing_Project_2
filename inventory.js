@@ -15,7 +15,7 @@ export class Inventory {
     createInventory() {
         this.container = this.scene.add.container(0, 0)
             .setScrollFactor(0)
-            .setDepth(500)
+            .setDepth(1000)
             .setVisible(false);
         
         let overlay = this.scene.add.rectangle(320, 180, 640, 360, 0x000000, 0.7)

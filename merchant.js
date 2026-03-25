@@ -6,7 +6,7 @@ export class Merchant {
         this.isOpen = false;
 
         this.container = this.scene.add.container(0, 0)
-        .setDepth(1000)
+        .setDepth(1002)
         .setVisible(false);
 
     }
@@ -69,7 +69,7 @@ export class Merchant {
         this.container.add(this.modeButtonBG);
 
         // Visible text
-        this.modeIndicator = this.scene.add.text(centerX, controlsY - 22, 'BUY', {
+        this.modeIndicator = this.scene.add.text(centerX, controlsY - 22, 'BUY MODE', {
             fontSize: '26px',
             fontStyle: 'bold',
             color: '#00ff00'
@@ -125,7 +125,7 @@ export class Merchant {
 
     toggleMode() {
         this.currentMode = this.currentMode === 'buy' ? 'sell' : 'buy';
-        this.modeIndicator.setText(`Mode: ${this.currentMode.toUpperCase()}`);
+        this.modeIndicator.setText(`${this.currentMode.toUpperCase()} MODE`);
         this.modeIndicator.setColor(this.currentMode === 'buy' ? '#00ff00' : '#ff0000');
         this.currentPage = 0;
         this.refreshItems();

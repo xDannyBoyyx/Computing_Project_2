@@ -7,7 +7,7 @@ export class Hotbar {
 
         this.container = this.scene.add.container(0, 0);
         this.container.setScrollFactor(0);
-        this.container.setDepth(600);
+        this.container.setDepth(1001);
 
         this.slots = [];
         this.tools = [];
