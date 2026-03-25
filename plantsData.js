@@ -13,7 +13,7 @@ export const plantData = {
     "raddish": {
         nextStageTimer: 4000,
         maxStage: 3,
-        sellValue: 5,
+        sellValue: 10,
         harvestMin: 1,
         harvestMax: 4,
         spriteSheet: "smallPlant",
@@ -22,7 +22,7 @@ export const plantData = {
     "wheat": {
         nextStageTimer: 3500,
         maxStage: 3,
-        sellValue: 8,
+        sellValue: 16,
         harvestMin: 2,
         harvestMax: 5,
         spriteSheet: "mediumPlant", 
@@ -31,7 +31,7 @@ export const plantData = {
     "cabbage": {
         nextStageTimer: 3750,
         maxStage: 3,
-        sellValue: 10,
+        sellValue: 20,
         harvestMin: 2,
         harvestMax: 4,
         spriteSheet: "mediumPlant", 
@@ -40,7 +40,7 @@ export const plantData = {
     "grape": {
         nextStageTimer: 4500,
         maxStage: 3,
-        sellValue: 12,
+        sellValue: 24,
         harvestMin: 2,
         harvestMax: 5,
         spriteSheet: "largePlant", 
@@ -49,7 +49,7 @@ export const plantData = {
     "chilli": {
         nextStageTimer: 5000,
         maxStage: 3,
-        sellValue: 15,
+        sellValue: 30,
         harvestMin: 2,
         harvestMax: 5,
         spriteSheet: "mediumPlant", 
