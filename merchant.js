@@ -38,6 +38,7 @@ export class Merchant {
             { key: 'cucumberPouch', price: 75, displaySize: 21 },
             { key: 'pineapplePouch', price: 100, displaySize: 21 },
             { key: 'pumpkinPouch', price: 200, displaySize: 21 },
+            { key: 'cauliflowerPouch', price: 300, displaySize: 21 },
         ];
 
         this.currentMode = 'buy';
