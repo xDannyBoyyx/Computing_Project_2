@@ -45,5 +45,14 @@ export const plantData = {
         harvestMax: 5,
         spriteSheet: "largePlant", 
         startFrame: 12
+    },
+    "chilli": {
+        nextStageTimer: 5000,
+        maxStage: 3,
+        sellValue: 6,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "mediumPlant", 
+        startFrame: 24
     }
 }
