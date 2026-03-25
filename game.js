@@ -50,6 +50,7 @@ class GameScene extends Phaser.Scene {
     this.load.image('raddishPouch', 'assets/pouches/raddishPouch.png');
     this.load.image('cabbagePouch', 'assets/pouches/cabbagePouch.png');
     this.load.image('grapePouch', 'assets/pouches/grapePouch.png');
+    this.load.image('chilliPouch', 'assets/pouches/chilliPouch.png');
     
     // Spritesheets VVV
 
