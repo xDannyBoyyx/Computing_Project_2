@@ -58,10 +58,19 @@ export const plantData = {
     "cucumber": {
         nextStageTimer: 5500,
         maxStage: 3,
-        sellValue: 40,
+        sellValue: 60,
         harvestMin: 2,
         harvestMax: 5,
         spriteSheet: "mediumPlant", 
         startFrame: 12
+    },
+    "pineapple": {
+        nextStageTimer: 6000,
+        maxStage: 3,
+        sellValue: 90,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "mediumPlant", 
+        startFrame: 4
     }
 }
