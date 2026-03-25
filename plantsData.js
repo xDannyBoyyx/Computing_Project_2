@@ -72,5 +72,14 @@ export const plantData = {
         harvestMax: 5,
         spriteSheet: "mediumPlant", 
         startFrame: 4
+    },
+    "pumpkin": {
+        nextStageTimer: 6500,
+        maxStage: 3,
+        sellValue: 140,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "mediumPlant", 
+        startFrame: 8
     }
 }
