@@ -81,5 +81,14 @@ export const plantData = {
         harvestMax: 5,
         spriteSheet: "mediumPlant", 
         startFrame: 8
+    },
+    "climbBeans": {
+        nextStageTimer: 7000,
+        maxStage: 3,
+        sellValue: 200,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "largePlant", 
+        startFrame: 4
     }
 }
