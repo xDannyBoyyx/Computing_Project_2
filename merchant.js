@@ -253,36 +253,51 @@ export class Merchant {
     }
 
     buyItem(item) {
-        const economy = this.scene.economy;
-        const inventory = this.scene.inventory;
-        if (!economy || !inventory) return;
-        if (!economy.spendGold(item.price)) return;
+    const economy = this.scene.economy;
+    const inventory = this.scene.inventory;
+    const hotbar = this.scene.hotbar;
 
-        const emptyIndex = inventory.items.findIndex(i => !i);
-        if (emptyIndex === -1) return;
+    if (!economy || !inventory) return;
+    if (!economy.spendGold(item.price)) return;
 
-        // reserve slot
-        inventory.items[emptyIndex] = { reserved: true };
-        const slot = inventory.slots[emptyIndex];
+    // Fills hotbar if empty slot
+    if (hotbar) {
+        const emptyHotbarIndex = hotbar.tools.findIndex(t => !t);
 
-        const itemSprite = this.scene.add.image(slot.x, slot.y, item.key)
-            .setDisplaySize(21, 21)
-            .setInteractive(new Phaser.Geom.Rectangle(-21, -21, 60, 60), Phaser.Geom.Rectangle.Contains);
-
-        this.scene.input.setDraggable(itemSprite);
-        itemSprite.source = 'inventory';
-        itemSprite.slotIndex = emptyIndex;
-
-        inventory.container.add(itemSprite);
-        
-
-        inventory.items[emptyIndex] = {
-            type: item.key,
-            sprite: itemSprite,
-            price: item.price,
-            displaySize: 21
-        };
+        if (emptyHotbarIndex !== -1) {
+            hotbar.addTool(item.key, emptyHotbarIndex, item.displaySize || 20);
+            return; // stop here if placed
+        }
     }
+
+    // Fills inv once hotbar is filled
+    const emptyIndex = inventory.items.findIndex(i => !i);
+    if (emptyIndex === -1) return;
+
+    // reserve slot
+    inventory.items[emptyIndex] = { reserved: true };
+    const slot = inventory.slots[emptyIndex];
+
+    const itemSprite = this.scene.add.image(slot.x, slot.y, item.key)
+        .setDisplaySize(21, 21)
+        .setInteractive(
+            new Phaser.Geom.Rectangle(-21, -21, 60, 60),
+            Phaser.Geom.Rectangle.Contains
+        );
+
+    this.scene.input.setDraggable(itemSprite);
+    itemSprite.source = 'inventory';
+    itemSprite.slotIndex = emptyIndex;
+
+    inventory.container.add(itemSprite);
+
+    inventory.items[emptyIndex] = {
+        type: item.key,
+        sprite: itemSprite,
+        price: item.price,
+        displaySize: 21
+    };
+}
     
     // Will add to this later, the price to which an item is sold should be able to be influnced by various factors (crop quality, demand etc.)
     sellItem(item) {

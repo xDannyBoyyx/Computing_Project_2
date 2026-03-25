@@ -31,36 +31,52 @@ export class Hotbar {
         this.addTool('Shovel', 6);   
     }
     
-    createSlots() {
-        const slotCount = 10;
+  createSlots() {
+    const slotCount = 10;
 
-        for (let i = 0; i < slotCount; i++) {
-            let x = 140 + i * 40;
-            let y = 330;
+    
+    for (let i = 0; i < slotCount; i++) {
+        let x = 140 + i * 40;
+        let y = 330;
 
-            // Slot rectangle
-            let slot = this.scene.add.rectangle(x, y, 32, 32, 0x444444)
-                .setStrokeStyle(2, 0xffffff)
-                .setScrollFactor(0)
-                .setInteractive({ useHandCursor: true });
+        // Slot rectangle
+        let slot = this.scene.add.rectangle(x, y, 32, 32, 0x444444)
+            .setStrokeStyle(2, 0xffffff)
+            .setScrollFactor(0)
+            .setInteractive({ useHandCursor: true });
 
-            this.container.add(slot);
-            this.slots.push(slot);
+        this.container.add(slot);
+        this.slots.push(slot);
 
-            slot.on('pointerdown', () => {
-                this.selectSlot(i);
-            });
-            
-            let label = i === 9 ? '0' : (i + 1).toString();
-            let text = this.scene.add.text(x - 10, y - 10, label, { fontSize: '10px' })
-                .setScrollFactor(0);
-            this.container.add(text);
-            
-            this.tools.push(null);
-        }
+        slot.on('pointerdown', () => {
+            this.selectSlot(i);
+        });
 
-        this.highlightSlot();
+        this.tools.push(null);
     }
+
+    
+    this.numberContainer = this.scene.add.container(0, 0).setScrollFactor(0);
+    this.container.add(this.numberContainer); // added after slots so it's always on top
+
+    for (let i = 0; i < slotCount; i++) {
+        let slot = this.slots[i];
+        let label = i === 9 ? '0' : (i + 1).toString();
+
+        // has a shadow so it's more visible, needed it to pop a bit
+        let text = this.scene.add.text(slot.x - 10, slot.y - 10, label, { 
+            fontSize: '10px',
+            color: '#ffffff'
+        })
+        .setShadow(1, 1, '#000000', 1, true, true); 
+
+        this.numberContainer.add(text);
+    }
+
+    this.highlightSlot();
+
+
+}
 
     setupHoverEffects() {
     // Track mouse movement to dim hotbar when hovering
@@ -112,7 +128,7 @@ export class Hotbar {
 }
 
     // Add a tool or crop to the hotbar
-addTool(toolKey, slotIndex, size = 20, offsetX = 0, offsetY = 0) {
+    addTool(toolKey, slotIndex, size = 20, offsetX = 0, offsetY = 0) {
     if (slotIndex < 0 || slotIndex >= this.slots.length) return;
 
     // removes sprite/tool if present
@@ -135,7 +151,12 @@ addTool(toolKey, slotIndex, size = 20, offsetX = 0, offsetY = 0) {
     // Can now click on the hotbar instead of behind it
     toolImage.on('pointerdown', () => this.selectSlot(slotIndex));
 
-    this.container.add(toolImage);
+    //  Tools are now below the number labels, numbers should always be visible now
+    if (this.numberContainer) {
+        this.container.addAt(toolImage, this.container.getIndex(this.numberContainer));
+    } else {
+        this.container.add(toolImage);
+    }
 
     let seedCountText = null;
     let seedCount = null;
@@ -148,7 +169,13 @@ addTool(toolKey, slotIndex, size = 20, offsetX = 0, offsetY = 0) {
             fontStyle: 'bold',
             backgroundColor: '#000000'
         }).setOrigin(0.5).setScrollFactor(0);
-        this.container.add(seedCountText);
+
+        // seed count below the numbers 
+        if (this.numberContainer) {
+            this.container.addAt(seedCountText, this.container.getIndex(this.numberContainer));
+        } else {
+            this.container.add(seedCountText);
+        }
     }
 
     this.tools[slotIndex] = { type: toolKey, sprite: toolImage, seedCount, seedCountText };
