@@ -54,5 +54,14 @@ export const plantData = {
         harvestMax: 5,
         spriteSheet: "mediumPlant", 
         startFrame: 24
+    },
+    "cucumber": {
+        nextStageTimer: 5500,
+        maxStage: 3,
+        sellValue: 40,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "mediumPlant", 
+        startFrame: 12
     }
 }
