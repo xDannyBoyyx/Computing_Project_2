@@ -29,7 +29,7 @@ export class Merchant {
             { key: 'Hammer', price: 30, displaySize: 21 },
             { key: 'Scythe', price: 60, displaySize: 21 },
             { key: 'Shovel', price: 25, displaySize: 21 },
-            { key: 'wheatPouch', price: 30, displaySize: 21 },
+            { key: 'wheatPouch', price: 20, displaySize: 21 },
             { key: 'carrotPouch', price: 25, displaySize: 21 },
             { key: 'raddishPouch', price: 35, displaySize: 21 },
             { key: 'cabbagePouch', price: 40, displaySize: 21 },
