@@ -15,6 +15,8 @@ import { Inventory } from './inventory.js';
 class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
+    this.isPaused = false; // To help with settings menu, it froze otherwise
+    this.menuOpen = false;   // tracks whether the SettingsMenu is open
   }
   
   preload() {
@@ -120,7 +122,8 @@ class GameScene extends Phaser.Scene {
     this.economy = new EconomyManager(this, 100); // Number argument = gold
     this.merchant = new Merchant(this);
     this.merchant.initUI();
-     
+    this.parentScene = data.parentScene;
+
     // Get selected gender from main menu (defaults to 'male' if not provided)
     const selectedGender = data.gender || 'male';
     const spriteKey = selectedGender === 'male' ? 'player' : 'playerFemale';
@@ -171,6 +174,26 @@ class GameScene extends Phaser.Scene {
     this.hotbar = new Hotbar(this);
     this.inventory = new Inventory(this);
     this.isUIOpen = false;
+
+    this.input.keyboard.on('keydown-ESC', () => {
+    if (!this.menuOpen) {
+        // Open settings menu
+        this.scene.launch('SettingsMenu', { parentScene: this.scene.key });
+        this.isPaused = true;       
+        this.menuOpen = true;       
+    } else {
+        // Close settings menu
+        const settings = this.scene.get('SettingsMenu');
+        // Destroy DOM elements if they exist
+        if (settings.hourInput) settings.hourInput.destroy();
+        if (settings.minInput) settings.minInput.destroy();
+        if (settings.weatherDropdown) settings.weatherDropdown.destroy();
+
+        this.scene.stop('SettingsMenu'); // stop the menu
+        this.isPaused = false;            // resume gameplay
+        this.menuOpen = false;            // mark menu as closed
+    }
+});
 
     this.backgroundMusic = this.sound.add('farmMusic', {
       volume: 0.5,   // 0.0 = silent & 1.0 = full volume

@@ -6,7 +6,7 @@ export class Merchant {
         this.isOpen = false;
 
         this.container = this.scene.add.container(0, 0)
-        .setDepth(1002)
+        .setDepth(1200)
         .setVisible(false);
 
     }

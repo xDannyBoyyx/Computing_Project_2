@@ -2,6 +2,8 @@
 // API URL: https://home.openweathermap.org/api_keys
 // API key: d67733d3cca63b07e935a9c72a8724fb
 
+import { GameSettings } from './gameSettings.js';
+
 export class WorldManager {
     constructor(scene){
         this.scene = scene;
@@ -164,6 +166,44 @@ export class WorldManager {
             }
         }
     }
+    
+
+    refreshTimeAndWeatherMode() {
+            this.realTime = GameSettings.useRealTime;
+            this.realWeather = GameSettings.useRealWeather;
+        
+            // Can adjust slightly, won't be completely accurate to their original forms, but good enough
+            if (this.clock && this.timeText){
+                const isRealTime = this.realTime;
+                this.clock.displayWidth = isRealTime ? 110 : 70;
+                this.clock.x = isRealTime ? 112 : 86;
+                this.timeText.x = isRealTime ? 100 : 80;
+            }
+        
+            // Update the time text itself
+            this.updateClock();
+        
+            // Refresh weather if toggled
+            if (this.realWeather !== this.lastWeatherSetting) {
+                this.lastWeatherSetting = this.realWeather;
+        
+                if (this.realWeather) {
+                    this.fetchWeatherData()
+                        .then(weather => {
+                            if (weather) {
+                                this.temperature = weather.temperature;
+                                this.currentWeather = weather.weatherType;
+                                this.reactToWeather();
+                                console.log(`Weather refreshed: ${this.currentWeather}, ${this.temperature}°C`);
+                            }
+                        })
+                        .catch(err => console.error('Error refreshing weather:', err));
+                } else {
+                    this.updateWeatherState();
+                    this.reactToWeather();
+                }
+            }
+        }
 
      // Depending on whether its real or in game weather, it'll affect the growth modifier which then speeds up or slows down the growth of the plant
     reactToWeather(){
