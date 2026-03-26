@@ -195,12 +195,16 @@ class GameScene extends Phaser.Scene {
     }
 });
 
-    this.backgroundMusic = this.sound.add('farmMusic', {
-      volume: 0.5,   // 0.0 = silent & 1.0 = full volume
-      loop: true     // loop the song
-    });
+   if (!this.sound.get('farmMusic')) {
+  this.backgroundMusic = this.sound.add('farmMusic', {
+    volume: 0.5,
+    loop: true
+  });
 
-    this.backgroundMusic.play();
+  this.backgroundMusic.play();
+} else {
+  this.backgroundMusic = this.sound.get('farmMusic');
+}
   }
   
   update(time, delta) {

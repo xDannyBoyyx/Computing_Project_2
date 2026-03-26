@@ -1,3 +1,6 @@
+
+import { GameSettings } from './gameSettings.js';
+
 export class MainMenu extends Phaser.Scene {
     constructor() {
         super({ key: 'MainMenu' });
@@ -20,7 +23,10 @@ export class MainMenu extends Phaser.Scene {
     }
     
     create() {
+        // Set background color for main menu
         this.cameras.main.setBackgroundColor('#fdf5ea');
+
+        // Display main menu image
         this.add.image(320, 180, 'menuScreen');
         
         // Character preview (top right corner)
@@ -34,7 +40,7 @@ export class MainMenu extends Phaser.Scene {
             fontFamily: 'Arial'
         }).setOrigin(0.5);
         
-        // Toggle button (click character to change)
+        // Toggle button (click character to change gender)
         let toggleArea = this.add.rectangle(550, 100, 80, 80, 0x000000, 0)
             .setInteractive({ useHandCursor: true });
         
@@ -46,6 +52,16 @@ export class MainMenu extends Phaser.Scene {
         let startButton = this.add.rectangle(315, 190, 165, 40, 0x000000, 0); // 0 = invisible, 0.5 to show outline of buttons
         startButton.setInteractive({ useHandCursor: true });
         startButton.on('pointerdown', () => {
+            // Apply any global settings (like weather) before starting game
+            // GameSettings should already be updated by SettingsMenu
+            // If you want, you could force defaults here:
+            if (typeof GameSettings.useRealWeather === 'undefined') {
+                GameSettings.useRealWeather = false; // default to PROC
+            }
+            if (typeof GameSettings.useRealTime === 'undefined') {
+                GameSettings.useRealTime = false; // default to in-game time
+            }
+
             // Pass selected gender to game
             this.scene.start('GameScene', { gender: this.selectedGender });
         });
@@ -55,6 +71,7 @@ export class MainMenu extends Phaser.Scene {
         optionsButton.setInteractive({ useHandCursor: true });
         optionsButton.on('pointerdown', () => {
             console.log('Options clicked');
+            // Launch the settings menu so player can change weather/time/etc.
             this.scene.launch('SettingsMenu');
         });
         
@@ -68,9 +85,10 @@ export class MainMenu extends Phaser.Scene {
     }
     
     toggleGender() {
+        // Switch between male and female character
         this.selectedGender = this.selectedGender === 'male' ? 'female' : 'male';
         
-        // Update preview sprite
+        // Update preview sprite and label
         if (this.selectedGender === 'male') {
             this.characterPreview.setTexture('playerMale', 0);
             this.genderLabel.setText('Male');

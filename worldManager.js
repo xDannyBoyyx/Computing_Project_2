@@ -46,8 +46,16 @@ export class WorldManager {
 
         this.weatherChange = false; // Intialised and declared for later use
 
-        this.realTime = true; // Set as default for now
-        this.realWeather = true; // Set as in game weather as default
+        // So it uses my settings instead
+
+        this.realTime = GameSettings.useRealTime;
+        this.realWeather = GameSettings.useRealWeather;
+
+        this.lastWeatherSetting = this.realWeather; // track changes
+
+
+         // Start fetching real weather  enabled
+        if (this.realWeather) this.fetchWeatherData().then(weather => this.reactToWeather());
 
         this.updateTimeDuration = 360000; // 6 minutes, in game time update as default for now
         if (this.realTime) this.updateTimeDuration = 21600000; // 6 hours, used for real world update simulation
@@ -171,6 +179,7 @@ export class WorldManager {
     refreshTimeAndWeatherMode() {
             this.realTime = GameSettings.useRealTime;
             this.realWeather = GameSettings.useRealWeather;
+            this.updateTimeDuration = this.realTime ? 21600000 : 360000;
         
             // Can adjust slightly, won't be completely accurate to their original forms, but good enough
             if (this.clock && this.timeText){
