@@ -113,8 +113,9 @@ class GameScene extends Phaser.Scene {
    
     this.worldManager = new WorldManager(this);
     this.worldManager.createUI();
-    this.farmManager = new FarmManager(this, map, this.WorldManager);
+    this.farmManager = new FarmManager(this, map, this.worldManager);
     this.worldManager.farmManager = this.farmManager; // Used because this worldManager was created before farmManager meaning the constructor value would be undefined
+    this.farmManager.worldManager = this.worldManager; // Used just in case worldManager doesn't initialize in time
 
     this.economy = new EconomyManager(this, 100); // Number argument = gold
     this.merchant = new Merchant(this);
@@ -192,7 +193,7 @@ class GameScene extends Phaser.Scene {
     this.worldManager.update(time, delta);
     this.merchant.update(time, delta);
     this.merchantNPC.update(); 
-}
+  }
 }
 
 // Configurations to how the game will work using Phaser's config

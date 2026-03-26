@@ -502,8 +502,8 @@ export class FarmManager {
                 let timeText = '';
                 if (plant.harvestable) {
                     timeText = 'Ready to harvest!';
-                } else {
-                    const timeLeft = plant.nextStageTimer - plant.growthTimer * this.worldManager.growthModifier;
+                } else {}{
+                    const timeLeft = plant.nextStageTimer - (plant.growthTimer * this.worldManager.growthModifier);
                     const secondsLeft = Math.ceil(timeLeft / 1000);
                     timeText = `${secondsLeft}s until next stage`;
                 }

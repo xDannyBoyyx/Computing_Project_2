@@ -45,7 +45,7 @@ export class WorldManager {
         this.weatherChange = false; // Intialised and declared for later use
 
         this.realTime = true; // Set as default for now
-        this.realWeather = false; // Set as in game weather as default
+        this.realWeather = true; // Set as in game weather as default
 
         this.updateTimeDuration = 360000; // 6 minutes, in game time update as default for now
         if (this.realTime) this.updateTimeDuration = 21600000; // 6 hours, used for real world update simulation
@@ -395,8 +395,8 @@ export class WorldManager {
 
     update(time, delta){
         // If in game time, update time will be 6 minutes (6 hours in game). If real time, it'll be real world 6 hours to update and react weather
-        // if (this.time - this.weatherTimer >= this.updateTimeDuration){ // 360000 ms : 6 minutes || 21600000 ms : 6 hours
-        if (this.time - this.weatherTimer >= 5000){ // 5 seconds for testing purposes
+        if (this.time - this.weatherTimer >= this.updateTimeDuration){ // 360000 ms : 6 minutes || 21600000 ms : 6 hours
+        // if (this.time - this.weatherTimer >= 5000){ // 5 seconds for testing purposes
                 this.weatherTimer = this.time;
                 this.updateWeatherState();
                 this.reactToWeather();

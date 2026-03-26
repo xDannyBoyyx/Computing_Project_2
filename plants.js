@@ -25,8 +25,13 @@ export class Plant {
         this.maxStages = plantData[this.type].maxStage; // Depending on the plants
 
         this.growthTimer = 0; // Timer that it'll use to grow real time
-        if (this.worldManager.realTime) this.nextStageTimer = plantData[this.type].nextStageTimer * 100; // If using real world time, make crops take longer to grow
+
+        console.log("WorldManager:", this.worldManager);
+        console.log("realTime property:", this.worldManager?.realTime);
+
+        if (this.worldManager?.realTime) this.nextStageTimer = plantData[this.type].nextStageTimer * 100; // If using real world time, make crops take longer to grow
         else this.nextStageTimer = plantData[this.type].nextStageTimer; // The timer set in plants data for the specific type
+        
         this.fullyGrown = false; // Only started growing so no
 
         this.harvestable = false; // Default as plant has only started growing
