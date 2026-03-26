@@ -25,15 +25,11 @@ export class Plant {
         this.maxStages = plantData[this.type].maxStage; // Depending on the plants
 
         this.growthTimer = 0; // Timer that it'll use to grow real time
-        this.nextStageTimer = plantData[this.type].nextStageTimer; // The timer set in plants data for the specific type
+        if (this.worldManager.realTime) this.nextStageTimer = plantData[this.type].nextStageTimer * 100; // If using real world time, make crops take longer to grow
+        else this.nextStageTimer = plantData[this.type].nextStageTimer; // The timer set in plants data for the specific type
         this.fullyGrown = false; // Only started growing so no
 
-        // this.growthModifier = 1; // How it affects the growth speed / moved to world manager as it made more sense
-
         this.harvestable = false; // Default as plant has only started growing
-
-        // example if (growthTimer >= growthSpeed * growthModifer)
-        // modifier will change depending on the weather for example
 
         this.sprite = scene.add.sprite(
             this.worldX + 8, // Center x wise
@@ -62,13 +58,12 @@ export class Plant {
         }
     }
 
+    // Ensuring factors are updating, especially the growth in this case
     update(time, delta){
         // delta = time passed since last frame (in milliseconds) not FPS
         this.growthTimer += delta;
 
         if (this.fullyGrown == false){
-            // this.reactToWeather(); // constantly reacting to the weather depending on what it is
-
             // Multiplied by growthModifier to see whether its slowed down or sped up due to weather conditions.
             if (this.growthTimer * this.worldManager.growthModifier >= this.nextStageTimer){ // seconds for now but in real game might be maybe even minutes
                 this.grow();

@@ -9,12 +9,16 @@ export class WorldManager {
         // Returns as a string and makes it more difficult to split into hours, minutes, and seconds.
         // this.time = new Date().toLocaleTimeString();
 
-        this.initialTime = new Date(); // Initialising and declaring real time for later use
+        // Initialized for later, cannot access farmManager as constructor value as its created after worldManager
+        this.farmManager = null;
+
+        this.weatherTimer = new Date(); // Initialising and declaring real time for later use
+        this.soilTimer = new Date();
         this.time; // Initialised for later use
 
-        this.hour = this.initialTime.getHours();
-        this.min = this.initialTime.getMinutes();
-        this.sec = this.initialTime.getSeconds();
+        this.hour = this.weatherTimer.getHours();
+        this.min = this.weatherTimer.getMinutes();
+        this.sec = this.weatherTimer.getSeconds();
 
         // Depending on whether decides to use real world time or in game time, these are the two different type strings VVV
         this.realTimeText = `${this.hour.toString().padStart(2, '0')}:${this.min.toString().padStart(2, '0')}:${this.min.toString().padStart(2, '0')}`;
@@ -246,6 +250,61 @@ export class WorldManager {
                 }
         }
 
+        // Big if statement that checks after a fraction of the updateTimeDuration, it'll either water or dry soil depending on the weather type
+        if (this.time - this.soilTimer >= this.updateTimeDuration / 4){ // Seems fitting for weather simulation
+        // if (this.time - this.soilTimer >= 2000){ // Used for testing purposes
+            this.soilTimer = this.time;
+
+            // Checking for dry(ing) weather types and then drying watered tiles
+            if (this.currentWeather == "clear" || 
+                this.currentWeather == "dry heat" || 
+                this.currentWeather == "windy"){
+
+                this.keys = Object.keys(this.farmManager.tiles); // Gaining the keys from tiles
+
+                this.validTiles = this.keys // Checking if they're valid (i.e. they've been tilled as well as watered)
+                    .map(key => ({ key, tile: this.farmManager.tiles[key] }))
+                    .filter(obj => obj.tile.tilled && obj.tile.watered);
+
+                if (this.validTiles.length === 0) return; // If there are none then quit
+
+                this.dryTiles = Math.floor(Math.random() * 3) + 1; // Choosing random amount of tiles to dry
+
+                for (let i = 0; i < this.dryTiles; i++) {
+                    this.randomObj = this.validTiles[Math.floor(Math.random() * this.validTiles.length)]; // Choosing the random keys/tiles to dry
+                    const [x, y] = this.randomObj.key.split(',').map(Number); // Applying it to the random tiles
+
+                    this.farmManager.dry(x, y); // Dry the tile(s) chosen
+                }
+            }
+            // Checking for weather states that cause wet soil, at least what i think. This will then water tiles randomly that are planted
+            else if (this.currentWeather == "rain" || 
+                this.currentWeather == "drizzle" || 
+                this.currentWeather == "snow" || 
+                this.currentWeather == "storm" || 
+                this.currentWeather == "squall" || 
+                this.currentWeather == "thunderstorm" || 
+                this.currentWeather == "blizzard"){
+
+                this.keys = Object.keys(this.farmManager.tiles); // Gathering the keys of tiles defined in farmManager
+
+                this.validTiles = this.keys // Checking if they're valid (i.e. they've been tilled so that they can be watered)
+                    .map(key => ({ key, tile: this.farmManager.tiles[key] }))
+                    .filter(obj => obj.tile.tilled);
+
+                if (this.validTiles.length === 0) return; // If there isn't any then just leave
+
+                this.waterTiles = Math.floor(Math.random() * 3) + 1; // 1–3 tiles roughly
+
+                for (let i = 0; i < this.waterTiles; i++) {
+                    this.randomObj = this.validTiles[Math.floor(Math.random() * this.validTiles.length)]; // Getting a random value within keys' length
+                    const [x, y] = this.randomObj.key.split(',').map(Number); // Choosing the specifc tile(s)
+
+                    this.farmManager.water(x, y); // Watering chosen tile(s)
+                }
+            }
+        }
+
         this.tempText = "";
         this.harshTemp = false; // Used to ensure growth modifier isn't altered every time reactToWeather() is called (e.g. +.3 +.3, -.3 -.3) 
 
@@ -336,9 +395,9 @@ export class WorldManager {
 
     update(time, delta){
         // If in game time, update time will be 6 minutes (6 hours in game). If real time, it'll be real world 6 hours to update and react weather
-        // if (this.time - this.initialTime >= this.updateTimeDuration){ // 360000 ms : 6 minutes || 21600000 ms : 6 hours
-        if (this.time - this.initialTime >= 5000){ // 5 seconds for testing purposes
-                this.initialTime = this.time;
+        // if (this.time - this.weatherTimer >= this.updateTimeDuration){ // 360000 ms : 6 minutes || 21600000 ms : 6 hours
+        if (this.time - this.weatherTimer >= 5000){ // 5 seconds for testing purposes
+                this.weatherTimer = this.time;
                 this.updateWeatherState();
                 this.reactToWeather();
         }

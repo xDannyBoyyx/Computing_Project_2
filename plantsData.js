@@ -1,8 +1,8 @@
 // This is where data for the different kinds of plants will be stored as then it wont be too cluttered on plants.js
-
+// Keeping the next stage timers quite low to ensure it doesn't take too long but also not too short for crops to grow.
 export const plantData = {
     "carrot": {
-        nextStageTimer: 3000,
+        nextStageTimer: 30000,
         maxStage: 3,
         sellValue: 2,
         harvestMin: 1,
@@ -11,7 +11,7 @@ export const plantData = {
         startFrame: 18
     },
     "raddish": {
-        nextStageTimer: 4000,
+        nextStageTimer: 40000,
         maxStage: 3,
         sellValue: 10,
         harvestMin: 1,
@@ -20,7 +20,7 @@ export const plantData = {
         startFrame: 27
     },
     "wheat": {
-        nextStageTimer: 3500,
+        nextStageTimer: 35000,
         maxStage: 3,
         sellValue: 16,
         harvestMin: 2,
@@ -29,7 +29,7 @@ export const plantData = {
         startFrame: 0
     },
     "cabbage": {
-        nextStageTimer: 3750,
+        nextStageTimer: 37500,
         maxStage: 3,
         sellValue: 20,
         harvestMin: 2,
@@ -38,7 +38,7 @@ export const plantData = {
         startFrame: 20 
     },
     "grape": {
-        nextStageTimer: 4500,
+        nextStageTimer: 45000,
         maxStage: 3,
         sellValue: 24,
         harvestMin: 2,
@@ -47,7 +47,7 @@ export const plantData = {
         startFrame: 12
     },
     "chilli": {
-        nextStageTimer: 5000,
+        nextStageTimer: 50000,
         maxStage: 3,
         sellValue: 30,
         harvestMin: 2,
@@ -56,7 +56,7 @@ export const plantData = {
         startFrame: 24
     },
     "cucumber": {
-        nextStageTimer: 5500,
+        nextStageTimer: 55000,
         maxStage: 3,
         sellValue: 60,
         harvestMin: 2,
@@ -65,7 +65,7 @@ export const plantData = {
         startFrame: 12
     },
     "pineapple": {
-        nextStageTimer: 6000,
+        nextStageTimer: 60000,
         maxStage: 3,
         sellValue: 90,
         harvestMin: 2,
@@ -74,7 +74,7 @@ export const plantData = {
         startFrame: 4
     },
     "pumpkin": {
-        nextStageTimer: 6500,
+        nextStageTimer: 65000,
         maxStage: 3,
         sellValue: 140,
         harvestMin: 2,
@@ -83,7 +83,7 @@ export const plantData = {
         startFrame: 8
     },
     "climbBeans": {
-        nextStageTimer: 7000,
+        nextStageTimer: 70000,
         maxStage: 3,
         sellValue: 200,
         harvestMin: 2,
@@ -92,7 +92,7 @@ export const plantData = {
         startFrame: 4
     },
     "sunflower": {
-        nextStageTimer: 7500,
+        nextStageTimer: 75000,
         maxStage: 3,
         sellValue: 300,
         harvestMin: 2,
@@ -101,7 +101,7 @@ export const plantData = {
         startFrame: 0
     },
     "brwnMush": {
-        nextStageTimer: 8500,
+        nextStageTimer: 85000,
         maxStage: 3,
         sellValue: 400,
         harvestMin: 2,
@@ -110,7 +110,7 @@ export const plantData = {
         startFrame: 4
     },
     "whteMush": {
-        nextStageTimer: 10000,
+        nextStageTimer: 100000,
         maxStage: 3,
         sellValue: 500,
         harvestMin: 2,

@@ -292,13 +292,12 @@ export class FarmManager {
         else if (toolType === 'Scythe' && tile.plant && tile.plant.harvestable) {
             this.tryHarvest(this.scene.player);
         }
-
         else {
-            console.log("Harvest not implemented yet");
+            console.log("Option not implemented yet");
         }
     }
 
-    // change so it shows last part of spritesheet.
+    // Change so it shows last part of spritesheet.
     tryHarvest(player) {
         const hotbar = this.scene.hotbar;
         const selectedTool = hotbar.getSelectedTool();
@@ -308,6 +307,7 @@ export class FarmManager {
 
         // Find only one harvestable plant within range
         let targetPlant = null;
+
         for (let plant of this.plantsArr) {
             const dist = Phaser.Math.Distance.Between(
                 player.sprite.x, player.sprite.y,
@@ -430,20 +430,37 @@ export class FarmManager {
 
     // Water a tile
     water(x, y) {
-        const tile = this.getTile(x, y);
+        this.tile = this.getTile(x, y);
 
         // Can only water tilled soil
-        if (tile.tilled) {
-            tile.watered = true;
+        if (this.tile.tilled) {
+            this.tile.watered = true;
 
             // Darkens the soil colour to show it's wet
-            if (tile.visual) {
-                tile.visual.tint = 0xB8C0D0; // Changing the tint to make it slightly darker / wet
+            if (this.tile.visual) {
+                this.tile.visual.tint = 0xB8C0D0; // Changing the tint to make it slightly darker / wet
             } else {
-                tile.visual.tint = 0xffffff; // Reseting it back to normal look
+                this.tile.visual.tint = 0xffffff; // Reseting it back to normal look
             }
 
             console.log(`Watered soil at ${x} & ${y}`); // Just ensuring its watered the right tile
+        }
+    }
+
+    // Decided to add this to use in worldManager so that tiles aren't always watered
+    // Copied same logic as the water function above
+    dry(x, y) {
+        this.tile = this.getTile(x, y);
+
+        if (this.tile.tilled && this.tile.watered) {
+            this.tile.watered = false;
+
+            // Resetting the visual (remove dark tint)
+            if (this.tile.visual) {
+                this.tile.visual.tint = 0xffffff; // Normal look
+            }
+
+            console.log("Tile dried:", x, y);
         }
     }
 
