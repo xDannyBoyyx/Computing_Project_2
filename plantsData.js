@@ -99,5 +99,23 @@ export const plantData = {
         harvestMax: 5,
         spriteSheet: "largePlant",
         startFrame: 0
+    },
+    "brwnMush": {
+        nextStageTimer: 8500,
+        maxStage: 3,
+        sellValue: 400,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "smallPlant",
+        startFrame: 4
+    },
+    "whteMush": {
+        nextStageTimer 10000,
+        maxStage: 3,
+        sellValue: 500,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "smallPlant",
+        startFrame: 12
     }
 }
