@@ -214,7 +214,7 @@ const config = {
   },
   audio: {               
     disableWebAudio: false, // this makes it so the music still plays when on another tab
-    noAudio: true
+    noAudio: false //change to turn off or on the audio
   },
   scene: [MainMenu,GameScene,SettingsMenu] //Switch MainMenu & GameScene if you don't want to see the main menu every time.
 };
