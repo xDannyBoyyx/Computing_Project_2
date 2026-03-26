@@ -90,5 +90,14 @@ export const plantData = {
         harvestMax: 5,
         spriteSheet: "largePlant", 
         startFrame: 4
+    },
+    "sunflower": {
+        nextStageTimer: 7500,
+        maxStage: 3,
+        sellValue: 300,
+        harvestMin: 2,
+        harvestMax: 5,
+        spriteSheet: "largePlant",
+        startFrame: 0
     }
 }
