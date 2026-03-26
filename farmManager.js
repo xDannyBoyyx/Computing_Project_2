@@ -11,7 +11,8 @@ const pouchToPlant = {
     'cucumberPouch': 'cucumber',
     'pineapplePouch': 'pineapple',
     'pumpkinPouch': 'pumpkin',
-    'climbBeansPouch': 'climbBeans'
+    'climbBeansPouch': 'climbBeans',
+    'sunflowerPouch': 'sunflower'
 };
 
 export class FarmManager {
