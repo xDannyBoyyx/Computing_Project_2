@@ -14,7 +14,7 @@ const pouchToPlant = {
     'climbBeansPouch': 'climbBeans',
     'sunflowerPouch': 'sunflower',
     'brwnMushPouch': 'brwnMush',
-    'whiteMushPouch': 'whiteMush'
+    'whteMushPouch': 'whteMush'
 };
 
 export class FarmManager {
