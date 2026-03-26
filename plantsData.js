@@ -110,7 +110,7 @@ export const plantData = {
         startFrame: 4
     },
     "whteMush": {
-        nextStageTimer 10000,
+        nextStageTimer: 10000,
         maxStage: 3,
         sellValue: 500,
         harvestMin: 2,
